@@ -1,0 +1,132 @@
+Overview:
+The Codon Bias Database was a web resource that provided the codon bias statistical calculations from the highly expressed genes for over 300 bacterial genomes. The purpose of the database was to provide users with the ability to look at codon bias in bacteria. The database was developed statically and as a result offered little insight the codon bias of novel bacterial genomes. Ideally, a user would be able to enter a RefSeq accession number and compute the codon bias of the bacterial genome by looking at the highly expressed genes in that genome. Such a resource could serve as an invaluable tool in the study of codon bias in bacterial organisms and would facilitate comparative studies.
+This project’s goal is to produce a web app using a framework such as python flask or Django that will calculate the codon bias for any bacterial genome provided to the database. The database will take unannotated or annotated genomes as input either in the format of an NCBI RefSeq Accession Number or a user uploaded file. In order to accomplish this, an open source bacterial genome annotator will be used to produce a list of highly expressed gene’s for an organism from which the biases will be directly calculated using a value such as the NRSCU( https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3463423)
+Context:
+           	Currently, the Codon Bias Database is no longer online. The codon bias database calculated all the genome’s codon bias statically. This project will dynamically calculate any bacterial genome’s codon bias allowing for faster analysis. This will allow for any number of applications such as producing a large database containing many more than the 17 genera and 300 strains of bacteria than the original codon bias database project. This will facilitate the analysis of codon bias and translational selection in bacteria.
+ 
+Goals:
+·        Users should be able to easily understand the user interface given a basic background in biology and codon bias usage statistics.
+·        Users should be able to upload a bacterial genome (fasta file), use a RefSeq accession number, or uploaded annotated genome files to the database easily like the format presented in NCBI’s Blast web application.
+·        Users that upload unannotated genomes can expect to have those genomes annotated by the web application.
+·        Users should be able to look at the output of the web application and easily understand what the output means. This entails that the output be centrally and elegantly displayed.
+·        Users should expect that the computation not take an unusual amount of time.
+·        Users should expect that input validation and error checking will occur in the program to ensure accurate and consistent results. (Only accepting certain types of files, always outputting the same values given the same type of file or providing extremely little variation in outputted measurements).
+·         Users can ultimately expect a value for the genome uploaded that accurately reflects the codon usage bias of the genome’s highly expressed genes. This could be the NRCSU value.
+·        The program should be on a webserver that can accept files around the size of bacterial genomes. In the future, support could be added for batch file uploads and multiple jobs at once.
+Non-Goals:
+           	This project is not concerned with creating a database. We will not need to develop SQL tables and do queries into databases other than the one’s in NCBI. We are not concerned with web application security. We are also not concerned with eukaryotic codon usage bias as this is more complicated.
+ 
+Metrics:
+*https://www.spinellis.gr/etech/swdev/nfmetric.htm*
+·        Extensibility:
+o   Program functions, classes, code blocks should be written using design patterns which facilitate development, ease debugging time, and allow for future addition of new features such as databases, batch processing, and integration into other environments. (Does it take a long time to add a new feature because we need to change code in other places?)
+o   Minimize dependencies(Do a lot of parts of the code depend on other parts of the code?)
+·        Testability:
+o   Software should be written in a format in which tests could be written to ensure the functioning of the code. (Are we able to write tests for most of the code)
+·        Reliability:
+o   Statistical measurements should be the same from run to run for all of the test data we use. (Is there any deviation?)
+o   Software should limit upload size to prevent server crashes. (Does the software limit upload size?)
+o   Software should only accept certain file formats such as fasta, gtf, or gff to ensure proper output and the prevention of infinite loops. (Does the software only accept certain file formats?)
+o   Are genome’s annotated?
+·        Ease of Use:
+o   Usability metrics:
+§  The amount of time in minutes it takes a new user to learn how to use this program
+§  The number of options a user has should be limited to a reasonable number given the amount of time it takes to learn this program.
+·        Time:
+o   Performance measurements of functions in milliseconds:
+§  How long do functions or blocks of code take to run? It should be kept to a reasonable timeframe(not hours given the resources we are using). Likely will be around 10-15 minutes per genome.
+o   Response time:
+§  How long does the program take to gather data, annotate the genome, and calculate the codon bias statistic in seconds.
+Milestones: ******SUBJECT TO CHANGE WEEKLY****
+
+Milestone 1: Week of 3/19/2019
+§  Jared: Find optimal tool for codon bias calculation
+§  Karson: Find optimal tool for gene annotation
+§  Brian: Find optimal tool for web framework development
+Milestone 2: Week of 3/26/2019
+§  Get the Codon Bias Calculation code working properly
+§  Everyone should be comfortable using simple web framework development library by the following week
+§  User Interface should be clarified. Where will the buttons be? How will the user upload a genome? How will the user be guided along the process?
+§  We should begin thinking about how the program will actually look at the list of highly expressed gene’s and calculate the codon bias. Ideally, we can use an existing program to do this.
+Milestone 3: Week of 4/2/2019:
+§  User Interface dummy code should be complete. This means that the buttons should all be there and should call dummy functions. The design pattern to do this will be the façade. It will wrap more complex functions into a pipelining function. The dummy functions will be replaced with the façade when other code is working properly. Tests should be written and completed as well ensuring that the proper functions are called when the button is pressed.
+§  Web application should be up as well with this user interface.
+§  The details on how the program will calculate code from Highly Expressed Gene’s should be ironed out by this point.
+§  The function that annotates a genome should be planned out at this point.
+§  The function that looks up the NCBI’s RefSeq genome should be planned out at this point.
+Milestone 4: Week of 4/9/2019:
+o   A basic pipeline should be completed that does not interact with the web interface yet. A list of highly expressed genes should ingest by the program and the codon usage bias should be calculated for this genome.
+Milestone 5: Week of 4/16/2019:
+o   A function that annotates a genome should be completed at this point.
+o   A function that looks up NCBI’s RefSeq genome, caches it, annotates it, deletes the original cache should be completed at this point.
+Milestone 6: Week of 4/23/2019:
+§  A complete pipeline should be established where a user can upload a genome to the program and the program should output the codon usage bias.
+Milestone 7: Week of 4/30/2019:
+§  The program should have all tests written and all tests should pass. User Interface Tests should be carried out among others in the class and most importantly Dr. Catherine Putonti.
+§  Debugging this week(And every other week)
+Milestone 8: Week of May 2nd:
+§  Program should be completely finished, documented, and commented on.
+ 
+ 
+
+Proposed Solution:
+ 
+A user desires to study the bacterial codon usage bias across several different genera of bacteria. The codon usage bias is not easily accessible to this user. The user will use this software by opening up a web application through a web browser such as Safari, Firefox, Chrome, or Internet Explorer. The user will then select the type of upload they will do: Annotated Genome(GTF file or maybe a GFF file), unannotated genome(a fasta file), or a RefSeq accession number. The user will do this for each bacterial genome and will be able to get a summary test statistic that accurately describes the codon usage bias of each genome. The user will be able to download this result as a table that displays the amino acid, the codon, and a such as the NRSCU as columns.
+ 
+Programming language: Python
+ 
+Web Application:
+Flask will be used.
+http://flask.pocoo.org/docs/1.0/quickstart/
+ 
+Python Flask will be used to implement the web application and user interface. The development framework will be used to create a web page where the user can select from one of three options from a dropdown menu: Annotated Genome, Unannotated Genome, RefSeq Accession Number. From there the user will be prompted/allowed to enter the necessary data. This will be done using SERVER SIDE programming such that the web server does the computation when the requests are made from the web application.
+ 
+ 
+Pipeline:
+ 
+§  A genome annotator such as Prodigal will be used to annotate bacterial genomes that are not already annotated. The calls to this genome annotator will be wrapped in python.
+§  RefSeq Accession Numbers provided to the program will have the FASTA data cached on the server temporarily, the data will be annotated using a genome annotator such as PROKKA or DFAST and then the cache will be deleted. All of this will be done using python to make calls to the operating system.
+§  Annotated files will be fed to a section of the pipeline that will do a BLAST of all of the annotated gene sequences against a database of Highly Expressed Genes in Bacteria(NCBI or more likely a local database on the server). All of the genes that are highly expressed will be retained and formatted into a fasta formatted list of sequences from which the codon usage bias will be calculated using the methods described in  https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3463423. Biopython will likely be used to accomplish both of these steps as it provides method for CAI calculation.
+ 
+ 
+Tasks in order of importance:
+
+Find optimal tool for codon usage calculation
+Find optimal tool for web application framework (Flask, or Dash)
+Find optimal tool for gene annotation
+Decide on User Interface Design
+Write Web Framework code such that calls on the website will be run natively on the server. Ideally, this is kind of like event oriented programming. There are listeners that will basically sit waiting for an event to happen. Does this mean we need sessions? Does this mean that we can have multiple people using this at once? 
+
+Write code that calculates CAI from a lists of HEGs
+Write code that annotates a fasta genome file.
+Write code that gets data from NCBI and annotates the genome fasta file.
+Write code that extracts the HEGs from an annotated genome file.
+Implement the façade pattern to abstract complexity away from the user interface.
+Map the user interface to the façade pattern functions.
+Write tests of User interface
+Write tests of codon usage calculation code
+Write tests of gene annotation code
+Write tests of NCBI extraction code
+Write tests of code that extracts HEGs
+Completely implement the pipelines by stringing together the varying components and mapping them in the façade to the proper web user interface option.
+
+
+For this week: 
+
+
+Jared:
+Find optimal tool for codon bias calculation
+
+
+Karson:
+Find optimal tool for gene annotation
+
+
+Brian:
+Find optimal tool for web framework development:
+
+Python flask: A Microframework that allows us to scale up as necessary but is barebones.
+We can handle file uploads and input data easily. We can probably add a nicer UI if we wanted. We can add support for sessions if we need to as well.
+https://pythonhosted.org/Flask-Uploads/
+
+
