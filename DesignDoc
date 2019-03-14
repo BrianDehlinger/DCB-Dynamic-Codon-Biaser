@@ -125,6 +125,13 @@ Find optimal tool for gene annotation
 Brian:
 Find optimal tool for web framework development:
 
+Notes for next week:
+
+We can use dependency injection and the decorator pattern to allow us to make different pipelines with much less dependency of code.
+We can consider other design patterns as well.
+
+We should use interfaces in order to do this. That way we can really reduce dependencies.
+
 Python flask: A Microframework that allows us to scale up as necessary but is barebones.
 We can handle file uploads and input data easily. We can probably add a nicer UI if we wanted. We can add support for sessions if we need to as well.
 https://pythonhosted.org/Flask-Uploads/
