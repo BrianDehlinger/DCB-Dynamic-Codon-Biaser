@@ -90,50 +90,94 @@ Pipeline:
  
  
 Tasks in order of importance:
+Always: Code comments, Documentation of what you did to make something work, commands run, how to install stuff, work on documentation.
 
-Find optimal tool for codon usage calculation
-Find optimal tool for web application framework (Flask, or Dash)
-Find optimal tool for gene annotation
-Decide on User Interface Design
-Write Web Framework code such that calls on the website will be run natively on the server. Ideally, this is kind of like event oriented programming. There are listeners that will basically sit waiting for an event to happen. Does this mean we need sessions? Does this mean that we can have multiple people using this at once? 
 
-Write code that calculates CAI from a lists of HEGs
+Write code that calculates RSCU from a lists of HEGs in fasta format. 
+Using python flask-uploads make dummy code that modifies a file a user submits and returns it in an html document to the user after 5 minutes.
+Implement the façade pattern to abstract complexity away from the user interface.
 Write code that annotates a fasta genome file.
 Write code that gets data from NCBI and annotates the genome fasta file.
 Write code that extracts the HEGs from an annotated genome file.
 Implement the façade pattern to abstract complexity away from the user interface.
-Map the user interface to the façade pattern functions.
+Map the user interface to the façade pattern functions(easy enough simply call the function)
 Write tests of User interface
 Write tests of codon usage calculation code
 Write tests of gene annotation code
 Write tests of NCBI extraction code
 Write tests of code that extracts HEGs
-Completely implement the pipelines by stringing together the varying components and mapping them in the façade to the proper web user interface option.
+Completely implement the pipelines by stringing together the varying components and mapping them in the façade to the proper web user interface option(PROJECT FINISH)
+Make Documentation
+
+
+Find optimal tool for codon usage calculation(COMPLETE)
+Find optimal tool for web application framework(COMPLETE)
+Find optimal tool for gene annotation(COMPLETE)
+Decide on User Interface Design(COMPLETE)
+Write Web Framework code such that calls on the website will be run natively on the server.(COMPLETE)
+
+
+Tasks by person:
+
+Brian:
+Beautify User Interface
+Add dynamic web page support using AJAX to run code live on a webpage(see translation example)
+Work on getting HEG file to fasta file(Everyone) 
+Try to break the code(Everyone)
+
 
 
 For this week: 
 
-
-Jared:
-Find optimal tool for codon bias calculation
+Get codon usage Bias code working properly, plan out HEGs.
 
 
-Karson:
-Find optimal tool for gene annotation
+Important interface code is below: discuss this week. It should be pretty good once we iron this out and discuss the purpose of abc.
+import abc
+
+class GeneralPipeline(abc.ABC):
+    def __init__(self, members):
+        self.members = members
+
+    ### Concrete method that should take fasta input files of the list of genes. We can code and test this now.
+    def get_bias(self, fasta):
+        print("get_bias has been called")
+
+    @abc.abstractmethod
+    ### This will vary. So far we have NCBI and a genome.
+    def get_data(self):
+        pass
+
+    @abc.abstractmethod
+    def gethegs(self):
+        pass
+
+    ## Concrete method that should be the same for all pipelines.
+    def output(self):
+        print("output has been called")
 
 
-Brian:
-Find optimal tool for web framework development:
+class ncbi_pipe(GeneralPipeline):
+    def get_data(self):
+        print("ncbi get_data has been called")
 
-Notes for next week:
+    ## Use Biopython to lookup the fasta file for a RefSeqID number. Input validation should be here as well. Make sure it is a fasta file.
+    def get_data_ncbi(self, accession):
+        print(accession)
 
-We can use dependency injection and the decorator pattern to allow us to make different pipelines with much less dependency of code.
-We can consider other design patterns as well.
+    def gethegs(self):
+        print("ncbi gethegs has been called")
 
-We should use interfaces in order to do this. That way we can really reduce dependencies.
 
-Python flask: A Microframework that allows us to scale up as necessary but is barebones.
-We can handle file uploads and input data easily. We can probably add a nicer UI if we wanted. We can add support for sessions if we need to as well.
-https://pythonhosted.org/Flask-Uploads/
+class genome_pipe(GeneralPipeline):
+
+
+class Facade:
+
+    def uploaded_genome(self):
+        pass
+
+    def ncbi(self, accession):
+        print(accession)
 
 
