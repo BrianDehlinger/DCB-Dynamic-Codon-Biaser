@@ -222,9 +222,13 @@ class CodonAdaptationIndex(object):
         for i in sorted(self.nrscu_index):
             print("%s\t%.3f" % (i, self.nrscu_index[i]))
 
+# example of how to use the code
+# create a new object of class CodonAdaptationIndex()
 test = CodonAdaptationIndex()
+#creat a CIA for which calculation is desired
 test.generate_rscu_index("abau.heg.fasta")
 test.generate_nrscu_index("abau.heg.fasta")
+#print the desired index
 test.print_nrscu_index()
 print()
 test.print_rscu_index()
