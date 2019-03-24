@@ -64,8 +64,9 @@ class CodonAdaptationIndex(object):
     codes: only the synonymous codons in the standard table are considered.
     """
 
-    def __init__(self):
+    def __init__(self, file):
         """Initialize the class."""
+        self.handle = file
         self.rscu_index = {}
         self.nrscu_index = {}
         self.codon_count = {}
@@ -79,7 +80,7 @@ class CodonAdaptationIndex(object):
         """
         self.index = index
 
-    def generate_rscu_index(self, fasta_file):
+    def generate_rscu_index(self):
         """Generate a codon usage index from a FASTA file of CDS sequences.
 
         Takes a location of a Fasta file containing CDS sequences
@@ -93,7 +94,7 @@ class CodonAdaptationIndex(object):
             raise ValueError("an RSCU index has already been set")
         # count codon occurrences in the file.
         if self.codon_count == {}:
-            self._count_codons(fasta_file)
+            self._count_codons(self.handle)
 
         # now to calculate the index we first need to sum the number of times
         # synonymous codons were used all together.
@@ -117,7 +118,7 @@ class CodonAdaptationIndex(object):
             for codon_index, codon in enumerate(codons):
                 self.rscu_index[codon] = rcsu[codon_index] / rcsu_max
 
-    def generate_nrscu_index(self, fasta_file):
+    def generate_nrscu_index(self):
         """Generate a codon usage index from a FASTA file of CDS sequences.
 
         Takes a location of a Fasta file containing CDS sequences
@@ -131,7 +132,7 @@ class CodonAdaptationIndex(object):
             raise ValueError("an NRSCU index has already been set")
         # count codon occurrences in the file.
         if self.codon_count == {}:
-            self._count_codons(fasta_file)
+            self._count_codons(self.handle)
 
         # now to calculate the index we first need to sum the number of times
         # synonymous codons were used all together.
@@ -222,13 +223,9 @@ class CodonAdaptationIndex(object):
         for i in sorted(self.nrscu_index):
             print("%s\t%.3f" % (i, self.nrscu_index[i]))
 
-# example of how to use the code
-# create a new object of class CodonAdaptationIndex()
-test = CodonAdaptationIndex()
-#creat a CIA for which calculation is desired
-test.generate_rscu_index("abau.heg.fasta")
-test.generate_nrscu_index("abau.heg.fasta")
-#print the desired index
+test = CodonAdaptationIndex("abau.heg.fasta")
+test.generate_rscu_index()
+test.generate_nrscu_index()
 test.print_nrscu_index()
 print()
 test.print_rscu_index()
