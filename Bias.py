@@ -225,10 +225,10 @@ class CodonAdaptationIndex(object):
 
 # example of how to use the code
 # create a new object of class CodonAdaptationIndex()
-test = CodonAdaptationIndex()
+test = CodonAdaptationIndex("abau.heg.fasta")
 #creat a CIA for which calculation is desired
-test.generate_rscu_index("abau.heg.fasta")
-test.generate_nrscu_index("abau.heg.fasta")
+test.generate_rscu_index()
+test.generate_nrscu_index()
 #print the desired index
 test.print_nrscu_index()
 print()
