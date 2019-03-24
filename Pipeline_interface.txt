@@ -13,6 +13,7 @@ Pipeline Interface
         HEGS()
                 - takes annotated genome
                 - return fasta of all HEGs in genome
+                - May use Prokka with the HEGs as the database
 
         returndata()
                 - prints table of results
@@ -21,14 +22,9 @@ Class RefSeq
 
         getdata(accession#)
                 - get fasta files from NCBI
-                  
-        annotate(fasta)
-                - calls to prokka
+                 
         HEGS()    
-                - calls BLAST to HEGs database
-
-        BLAST()   
-                - local BLAST against a database of the HEGs
+                - calls Prokka to HEGs database
 
 
 
