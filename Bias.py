@@ -54,14 +54,12 @@ SynonymousCodons = {
     'TYR': ['TAT', 'TAC']}
 
 
-class CodonAdaptationIndex(object):
-    """A codon adaptation index (CAI) implementation.
+class CodonUsageTable(object):
+    """A codon usage table implementation.
 
-    Implements the codon adaptation index (CAI) described by Sharp and
-    Li (Nucleic Acids Res. 1987 Feb 11;15(3):1281-95).
-
-    NOTE - This implementation does not currently cope with alternative genetic
-    codes: only the synonymous codons in the standard table are considered.
+    Creates a table of codon usage for RCSU, NRCSU
+    and HEG FB values when given a FASTA file of bacterial
+    HEGs
     """
 
     def __init__(self, file):
@@ -72,22 +70,22 @@ class CodonAdaptationIndex(object):
         self.codon_count = {}
 
 
-    def generate_rcsu_index(self):
-        """Generate a codon usage index from a FASTA file of CDS sequences.
+    def generate_rcsu_table(self):
+        """Generate a codon usage table from a FASTA file of CDS sequences.
 
         Takes a location of a Fasta file containing CDS sequences
         (which must all have a whole number of codons) and generates a codon
-        usage index.
+        usage table for RCSU values.
 
         RCSU values
         """
-        # first make sure we're not overwriting an existing RSCU index:
+        # first make sure we're not overwriting an existing RSCU table:
         if self.rcsu_index != {}:
             raise ValueError("an RSCU index has already been set")
         # count codon occurrences in the file.
         self._count_codons(self.handle)
 
-        # now to calculate the index we first need to sum the number of times
+        # now to calculate the table we first need to sum the number of times
         # synonymous codons were used all together.
         for aa in SynonymousCodons:
             total = 0.0
@@ -104,17 +102,16 @@ class CodonAdaptationIndex(object):
                 denominator = float(total) / len(codons)
                 rcsu.append(self.codon_count[codon] / denominator)
 
-            # now generate the index W=RCSUi/RCSUmax:
-            rcsu_max = max(rcsu)
+            # now add the RCSU values to the table
             for codon_index, codon in enumerate(codons):
                 self.rcsu_index[codon] = rcsu[codon_index]
 
-    def generate_nrcsu_index(self):
-        """Generate a codon usage index from a FASTA file of CDS sequences.
+    def generate_nrcsu_table(self):
+        """Generate a codon usage table from a FASTA file of CDS sequences.
 
         Takes a location of a Fasta file containing CDS sequences
         (which must all have a whole number of codons) and generates a codon
-        usage index.
+        usage table for NRCSU values.
 
         NRCSU values
         """
@@ -140,8 +137,7 @@ class CodonAdaptationIndex(object):
                 denominator = float(total)
                 nrcsu.append(self.codon_count[codon] / denominator)
 
-            # now generate the index W=RCSUi/RCSUmax:
-            nrcsu_max = max(nrcsu)
+            # now add the NRCSU values to the table
             for codon_index, codon in enumerate(codons):
                 self.nrcsu_index[codon] = nrcsu[codon_index]
 
@@ -168,17 +164,13 @@ class CodonAdaptationIndex(object):
                                         % (codon, cur_record.id))
 
     def print_rcsu_index(self):
-        """Print out the index used.
-
-        This just gives the index when the objects is printed.
+        """Print out the RCSU table.
         """
         for i in sorted(self.rcsu_index):
             print("%s\t%.3f" % (i, self.rcsu_index[i]))
 
     def print_nrcsu_index(self):
-        """Print out the index used.
-
-        This just gives the index when the objects is printed.
+        """Print out the NRCSU table.
         """
         for i in sorted(self.nrcsu_index):
             print("%s\t%.3f" % (i, self.nrcsu_index[i]))
