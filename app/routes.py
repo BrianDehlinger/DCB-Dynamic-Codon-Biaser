@@ -40,17 +40,17 @@ def upload():
 def uploader():
 	if request.method == 'POST':
 		if 'file' not in request.files:
-			flash('No file')
-			return redirect(request.url)
+			print("ERROR FILE NOT IN REQUEST.FILES")
+			return redirect('/upload')
 		file = request.files['file']
 		if file.filename == '':
 			flash('Please select a file to upload')
-			return redirect(request.url)
+			return redirect('/upload')
 		if file and allowed_file(file.filename):
 			filename = secure_filename(file.filename)
 			file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
 			flash('Your file has successfully been uploaded to the server')
-			return redirect('/')
+			return redirect('/index')
 
 
 
