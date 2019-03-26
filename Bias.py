@@ -162,14 +162,16 @@ class CodonUsageTable(object):
                         raise TypeError("illegal codon %s in gene: %s"
                                         % (codon, cur_record.id))
 
-    def print_rcsu_index(self):
+    def print_rcsu_table(self):
         """Print out the RCSU table.
         """
+        print ("RCSU")
         for i in sorted(self.rcsu_index):
             print("%s\t%.3f" % (i, self.rcsu_index[i]))
 
-    def print_nrcsu_index(self):
+    def print_nrcsu_table(self):
         """Print out the NRCSU table.
         """
+        print("NRCSU")
         for i in sorted(self.nrcsu_index):
             print("%s\t%.3f" % (i, self.nrcsu_index[i]))
