@@ -67,20 +67,12 @@ class CodonAdaptationIndex(object):
     def __init__(self, file):
         """Initialize the class."""
         self.handle = file
-        self.rscu_index = {}
-        self.nrscu_index = {}
+        self.rcsu_index = {}
+        self.nrcsu_index = {}
         self.codon_count = {}
 
-    # use this method with predefined CAI index
-    def set_cai_index(self, index):
-        """Set up an index to be used when calculating CAI for a gene.
 
-        Just pass a dictionary similar to the SharpEcoliIndex in the
-        CodonUsageIndices module.
-        """
-        self.index = index
-
-    def generate_rscu_index(self):
+    def generate_rcsu_index(self):
         """Generate a codon usage index from a FASTA file of CDS sequences.
 
         Takes a location of a Fasta file containing CDS sequences
@@ -90,11 +82,10 @@ class CodonAdaptationIndex(object):
         RCSU values
         """
         # first make sure we're not overwriting an existing RSCU index:
-        if self.rscu_index != {}:
+        if self.rcsu_index != {}:
             raise ValueError("an RSCU index has already been set")
         # count codon occurrences in the file.
-        if self.codon_count == {}:
-            self._count_codons(self.handle)
+        self._count_codons(self.handle)
 
         # now to calculate the index we first need to sum the number of times
         # synonymous codons were used all together.
@@ -116,9 +107,9 @@ class CodonAdaptationIndex(object):
             # now generate the index W=RCSUi/RCSUmax:
             rcsu_max = max(rcsu)
             for codon_index, codon in enumerate(codons):
-                self.rscu_index[codon] = rcsu[codon_index] / rcsu_max
+                self.rcsu_index[codon] = rcsu[codon_index]
 
-    def generate_nrscu_index(self):
+    def generate_nrcsu_index(self):
         """Generate a codon usage index from a FASTA file of CDS sequences.
 
         Takes a location of a Fasta file containing CDS sequences
@@ -128,11 +119,10 @@ class CodonAdaptationIndex(object):
         NRCSU values
         """
         # first make sure we're not overwriting an existing NRSCU index:
-        if self.nrscu_index != {}:# or self.codon_count != {}:
+        if self.nrcsu_index != {}:
             raise ValueError("an NRSCU index has already been set")
         # count codon occurrences in the file.
-        if self.codon_count == {}:
-            self._count_codons(self.handle)
+        self._count_codons(self.handle)
 
         # now to calculate the index we first need to sum the number of times
         # synonymous codons were used all together.
@@ -153,38 +143,8 @@ class CodonAdaptationIndex(object):
             # now generate the index W=RCSUi/RCSUmax:
             nrcsu_max = max(nrcsu)
             for codon_index, codon in enumerate(codons):
-                self.nrscu_index[codon] = nrcsu[codon_index] / nrcsu_max
+                self.nrcsu_index[codon] = nrcsu[codon_index]
 
-
-    def cai_for_gene(self, dna_sequence):
-        """Calculate the CAI (float) for the provided DNA sequence (string).
-
-        This method uses the Index (either the one you set or the one you
-        generated) and returns the CAI for the DNA sequence.
-        """
-        cai_value, cai_length = 0, 0
-
-        # if no index is set or generated, the default SharpEcoliIndex will
-        # be used.
-        if self.index == {}:
-            self.set_cai_index(SharpEcoliIndex)
-
-        if dna_sequence.islower():
-            dna_sequence = dna_sequence.upper()
-
-        for i in range(0, len(dna_sequence), 3):
-            codon = dna_sequence[i:i + 3]
-            if codon in self.index:
-                # these two codons are always one, exclude them:
-                if codon not in ['ATG', 'TGG']:
-                    cai_value += math.log(self.index[codon])
-                    cai_length += 1
-            # some indices may not include stop codons:
-            elif codon not in ['TGA', 'TAA', 'TAG']:
-                raise TypeError("illegal codon in sequence: %s.\n%s"
-                                % (codon, self.index))
-
-        return math.exp(cai_value / (cai_length - 1.0))
 
     def _count_codons(self, fasta_file):
         with open(fasta_file, 'r') as handle:
@@ -207,29 +167,18 @@ class CodonAdaptationIndex(object):
                         raise TypeError("illegal codon %s in gene: %s"
                                         % (codon, cur_record.id))
 
-    def print_rscu_index(self):
+    def print_rcsu_index(self):
         """Print out the index used.
 
         This just gives the index when the objects is printed.
         """
-        for i in sorted(self.rscu_index):
-            print("%s\t%.3f" % (i, self.rscu_index[i]))
+        for i in sorted(self.rcsu_index):
+            print("%s\t%.3f" % (i, self.rcsu_index[i]))
 
-    def print_nrscu_index(self):
+    def print_nrcsu_index(self):
         """Print out the index used.
 
         This just gives the index when the objects is printed.
         """
-        for i in sorted(self.nrscu_index):
-            print("%s\t%.3f" % (i, self.nrscu_index[i]))
-
-# example of how to use the code
-# create a new object of class CodonAdaptationIndex()
-test = CodonAdaptationIndex("abau.heg.fasta")
-#create a CIA for which calculation is desired
-test.generate_rscu_index()
-test.generate_nrscu_index()
-#print the desired index
-test.print_nrscu_index()
-print()
-test.print_rscu_index()
+        for i in sorted(self.nrcsu_index):
+            print("%s\t%.3f" % (i, self.nrcsu_index[i]))
