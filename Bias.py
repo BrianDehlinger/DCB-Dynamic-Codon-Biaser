@@ -125,7 +125,7 @@ class CodonAdaptationIndex(object):
         (which must all have a whole number of codons) and generates a codon
         usage index.
 
-        RCSU values
+        NRCSU values
         """
         # first make sure we're not overwriting an existing NRSCU index:
         if self.nrscu_index != {}:# or self.codon_count != {}:
