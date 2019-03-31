@@ -21,8 +21,6 @@ def get_accession_data(accession):
 		return theURL
 
 
-
-
 ## Gets the URL for the Assembly link from NCBI's refseq accession 
 	temporaryURL2 = temporaryURL + find_url('/assembly', soup)
 	new_request = requests.get(temporaryURL2)
