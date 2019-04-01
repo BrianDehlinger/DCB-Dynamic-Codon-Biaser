@@ -2,11 +2,13 @@ import requests
 import bs4
 import re
 import os
-
+#tests to see if and where code stops 
+print("1")
 ## Gets the HTML file for the NCBI accession number of interest.
 def get_accession_data(accession):
 	the_request = requests.get("https://www.ncbi.nlm.nih.gov/nuccore/" + accession)
-	soup = bs4.BeautifulSoup(the_request.text)
+	soup = bs4.BeautifulSoup(the_request.text, 'features="lxml"')
+    
 
 ## Base URL Of NCBI common to all URLS
 	temporaryURL = 'https://www.ncbi.nlm.nih.gov'
@@ -21,10 +23,11 @@ def get_accession_data(accession):
 		return theURL
 
 
+
 ## Gets the URL for the Assembly link from NCBI's refseq accession 
 	temporaryURL2 = temporaryURL + find_url('/assembly', soup)
 	new_request = requests.get(temporaryURL2)
-	new_soup = bs4.BeautifulSoup(new_request.text, 'html.parser')
+	new_soup = bs4.BeautifulSoup(new_request.text)
 
 ## Finds the div element with a rprt class  
 	items = new_soup.find("div", class_="rprt")
@@ -33,7 +36,8 @@ def get_accession_data(accession):
 	temporaryURL2 = temporaryURL + find_url('/assembly', items)
 
 	new_request = requests.get(temporaryURL2)
-	new_soup = bs4.BeautifulSoup(new_request.text)
+	#features is the default html parser
+	new_soup = bs4.BeautifulSoup(new_request.text, 'features="lxml"')
 
 ## Searches for the FTP File folder in the assembly HTML webpage.
 	url = ''
@@ -47,6 +51,9 @@ def get_accession_data(accession):
 	lastPieceOfUrl = re.findall('[^\/]+$', url)[0]
 	downloadUrl = url + "/" + lastPieceOfUrl + "_genomic.fna.gz"
 	os.system("wget " + downloadUrl)
-
+#Test to see if and where code stops
+print('2')
 ## Test code to verify it works
 get_accession_data('NC_003888.3')
+#Test to see if and when code stops
+print('3')
