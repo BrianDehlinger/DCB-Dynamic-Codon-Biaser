@@ -51,9 +51,13 @@ def get_accession_data(accession):
 	lastPieceOfUrl = re.findall('[^\/]+$', url)[0]
 	downloadUrl = url + "/" + lastPieceOfUrl + "_genomic.fna.gz"
 	os.system("wget " + downloadUrl)
+
 #Test to see if and where code stops
 print('2')
 ## Test code to verify it works
 get_accession_data('NC_003888.3')
+get_accession_data()
+get_accession_data()
+get_accession_data()
 #Test to see if and when code stops
 print('3')
