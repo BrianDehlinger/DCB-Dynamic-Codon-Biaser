@@ -15,5 +15,6 @@ class Test(unittest.Testcase):
 		result = ""
 		self.assertequal(result, get_bias(fasta)
 	
+#makes the running test easier
 if __name__ == '__main__':
 	unittest.main()
