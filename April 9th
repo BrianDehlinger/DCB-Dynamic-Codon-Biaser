@@ -1,0 +1,11 @@
+Brian:
+Added code for cleanup of HEGs to get 40 clean genes in fasta format.
+Added code utilizing diamond to search for HEGs from a local database file.
+
+Jared:
+Implemented Bias calulcation code.
+Added Bias code to pipeline code in place of dummy functions.
+
+Karson:
+Unit testing skeleton code implemented. 
+Ran tests and stress tests on code
