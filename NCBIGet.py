@@ -18,7 +18,8 @@ def get_accession_data(accession):
             for a in soup.find_all('a', href=True):
                 if('/assembly' in a['href']):
                     theURL = theURL + a['href']
-            break
+           	    break
+
             return theURL
     except:
         print('failed attempt')

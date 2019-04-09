@@ -40,7 +40,7 @@ class NcbiPipe(GeneralPipeline):
 	
 
     def get_hegs(self):
-        os.system("./diamond blastx -d testDB -q " + self.file + " -o matches -f 6 stitle bitscore qseqid -k 1")
+        os.system("./diamond blastx -d testDB -q " + self.file + " -o temp/matches -f 6 stitle bitscore qseqid -k 1")
 
     def clean_hegs(self):
         df = pandas.read_table("temp/matches", names=["Subject", "Bit", "SeqID"], skipinitialspace=True)
