@@ -43,7 +43,7 @@ class NcbiPipe(GeneralPipeline):
         os.system("./diamond blastx -d testDB -q " + self.file + " -o temp/matches -f 6 stitle bitscore qseqid") 
 
     def clean_hegs(self):
-        df = pandas.read_table("temp/matches", names=["Subject", "Bit", "SeqID"], skipinitialspace=True)
+        df = pandas.read_table("matches", names=["Subject", "Bit", "SeqID"], skipinitialspace=True)
         df = df.replace('\[.*\]', '', regex=True)
         df["Subject"] = df["Subject"].str.strip()
         df["Subject"] = df["Subject"].apply(lambda x: ' '.join(x.split(' ')[1:]))
@@ -53,13 +53,11 @@ class NcbiPipe(GeneralPipeline):
         items = df2.SeqID.unique()
         newSeqs = []
         for seq_record in SeqIO.parse("theCDS", "fasta"):
-            if (seq_record.id in items):
+	    if (seq_record.id in items):
                 newSeqs.append(seq_record)
-        print(newSeqs)
 
-        with open("temp/temporary.fasta", "w") as handle:
-            SeqIO.write(newSeqs, handle, "fasta")
-
+        with open("temporary.fasta", "w") as handle:
+	        SeqIO.write(newSeqs, handle, "fasta")
 
 
 
