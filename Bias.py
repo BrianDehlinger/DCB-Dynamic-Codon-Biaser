@@ -66,7 +66,9 @@ class CodonUsageTable(object):
         self.handle = file
         self.rcsu_index = {}
         self.nrcsu_index = {}
+        self.hegfb_index = {}
         self.codon_count = {}
+        self.total_codons = 0
 
 
     def generate_rcsu_table(self):
@@ -114,7 +116,7 @@ class CodonUsageTable(object):
 
         NRCSU values
         """
-        # first make sure we're not overwriting an existing NRSCU index:
+        # first make sure we're not overwriting an existing NRSCU table:
         if self.nrcsu_index != {}:
             raise ValueError("an NRSCU index has already been set")
         # count codon occurrences in the file.
@@ -140,6 +142,41 @@ class CodonUsageTable(object):
             for codon_index, codon in enumerate(codons):
                 self.nrcsu_index[codon] = nrcsu[codon_index]
 
+    def generate_hegfb_table(self):
+        """Generate a codon usage table from a FASTA file of CDS sequences.
+
+        Takes a location of a Fasta file containing CDS sequences
+        (which must all have a whole number of codons) and generates a codon
+        usage table for HEG FB values.
+
+        HEG FB values
+        """
+        # first make sure we're not overwriting an existing HEG FB table:
+        if self.hegfb_index != {}:
+            raise ValueError("an HEG FB index has already been set")
+        # count codon occurrences in the file.
+        self._count_codons(self.handle)
+
+        # now to calculate the index we first need to sum the number of times
+        # synonymous codons were used all together.
+        for aa in SynonymousCodons:
+            total = 0.0
+            # HEG FB values are CodonCount/sum of all synonymous codons * sum of all codons in dataset
+            hegfb = []
+            codons = SynonymousCodons[aa]
+
+            for codon in codons:
+                total += self.codon_count[codon]
+
+            # calculate the HEG FB value for each of the codons
+            for codon in codons:
+                denominator = float(total) * self.total_codons
+                hegfb.append(self.codon_count[codon] / denominator)
+
+            # now add the HEG FB values to the table
+            for codon_index, codon in enumerate(codons):
+                self.hegfb_index[codon] = hegfb[codon_index]
+
 
     def _count_codons(self, fasta_file):
         with open(fasta_file, 'r') as handle:
@@ -158,6 +195,7 @@ class CodonUsageTable(object):
                     codon = dna_sequence[i:i + 3]
                     if codon in self.codon_count:
                         self.codon_count[codon] += 1
+                        self.total_codons += 1
                     else:
                         raise TypeError("illegal codon %s in gene: %s"
                                         % (codon, cur_record.id))
@@ -175,3 +213,10 @@ class CodonUsageTable(object):
         print("NRCSU")
         for i in sorted(self.nrcsu_index):
             print("%s\t%.3f" % (i, self.nrcsu_index[i]))
+
+    def print_hegfb_table(self):
+        """Print out the HEG FB table.
+        """
+        print("HEG FB")
+        for i in sorted(self.hegfb_index):
+            print("%s\t%.f" % (i, self.hegfb_index[i]))

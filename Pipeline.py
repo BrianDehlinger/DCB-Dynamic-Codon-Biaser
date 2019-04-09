@@ -11,7 +11,6 @@ class GeneralPipeline(abc.ABC):
 
     ### Concrete method that should take fasta input files of the list of genes. We can code and test this now.
     def get_bias(self, fasta):
-        print("get_bias has been called")
         index = CodonUsageTable(fasta)
         index.generate_rcsu_table()
         index.generate_nrcsu_table()
