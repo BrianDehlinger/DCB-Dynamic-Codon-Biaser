@@ -12,14 +12,16 @@ def get_accession_data(accession):
     temporaryURL = 'https://www.ncbi.nlm.nih.gov'
 
 ## Function that finds first href that contain part of the urlPiece in the url. 
-    def find_url(urlPiece, soup):
-        theURL = ''
-        for a in soup.find_all('a', href=True):
-             if('/assembly' in a['href']):
-                theURL = theURL + a['href']
-                break
-        return theURL
-
+    try:
+        def find_url(urlPiece, soup):
+            theURL = ''
+            for a in soup.find_all('a', href=True):
+                if('/assembly' in a['href']):
+                    theURL = theURL + a['href']
+            break
+            return theURL
+    except:
+        print('failed attempt')
 
 
 
