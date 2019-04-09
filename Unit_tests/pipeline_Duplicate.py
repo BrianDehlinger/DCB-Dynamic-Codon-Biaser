@@ -5,6 +5,7 @@ class GeneralPipeline(abc.ABC):
         self.members = members
 
     ### Concrete method that should take fasta input files of the list of genes. We can code and test this now.
+	#unit test for accurate numbers   
     def get_bias(self, fasta):
         print("get_bias has been called")
 
@@ -14,6 +15,7 @@ class GeneralPipeline(abc.ABC):
         pass
 
     @abc.abstractmethod
+    #maybe
     def gethegs(self):
         pass
 
