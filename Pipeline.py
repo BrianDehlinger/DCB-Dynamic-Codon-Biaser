@@ -38,13 +38,15 @@ class NcbiPipe(GeneralPipeline):
     ## This function downloads the genome from a refseq accession number
     def get_data(self, accession):
         self.file = "temp/" + get_accession_data(accession)
+	
 
     def get_hegs(self):
-        os.system("./diamond blastx -d testDB -q " + self.file + " -o temp/matches -f 6 stitle bitscore qseqid") 
+        os.system("./diamond blastx -d testDB -q " + self.file + " -o matches -f 6 stitle bitscore qseqid -k 1")
 
     def clean_hegs(self):
-        df = pandas.read_table("temp/matches", names=["Subject", "Bit", "SeqID"], skipinitialspace=True)
+        df = pandas.read_table("matches", names=["Subject", "Bit", "SeqID"], skipinitialspace=True)
         df = df.replace('\[.*\]', '', regex=True)
+        print(df.head())
         df["Subject"] = df["Subject"].str.strip()
         df["Subject"] = df["Subject"].apply(lambda x: ' '.join(x.split(' ')[1:]))
         df = df.replace("elongation factor EF-2", "elongation factor G")
@@ -52,10 +54,11 @@ class NcbiPipe(GeneralPipeline):
         df2 = df2.loc[df2.groupby('Subject')["Bit"].idxmax()].reset_index(drop=True)
         items = df2.SeqID.unique()
         newSeqs = []
-        for seq_record in SeqIO.parse("theCDS", "fasta"):
+        for seq_record in SeqIO.parse(self.file, "fasta"):
             if (seq_record.id in items):
+                print(seq_record)
                 newSeqs.append(seq_record)
-        print(newSeqs)
+
 
         with open("temp/temporary.fasta", "w") as handle:
             SeqIO.write(newSeqs, handle, "fasta")
