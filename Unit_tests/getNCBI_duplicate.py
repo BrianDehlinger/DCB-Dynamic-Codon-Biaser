@@ -21,14 +21,14 @@ def find_url(urlPiece, S):
     theURL = ''
     
     try:
-    for a in soup.find_all('a', href=True):
-        if('/assembly' in a['href']):
-            theURL = theURL + a['href']
-            break
-    print(theURL)
+        for a in soup.find_all('a', href=True):
+            if('/assembly' in a['href']):
+                theURL = theURL + a['href']
+                break
+        print(theURL)
     
-    catch:
-    print("invalid assembly")
+    except:
+        print("invalid assembly")
 
 
 
@@ -64,8 +64,6 @@ def find_url(urlPiece, S):
 print('2')
 ## Test code to verify it works
 get_accession_data('NC_003888.3')
-get_accession_data()
-get_accession_data()
-get_accession_data()
+
 #Test to see if and when code stops
 print('3')

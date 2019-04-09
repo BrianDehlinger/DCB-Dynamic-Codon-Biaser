@@ -10,7 +10,9 @@ class TestCalc(unitttest.Testcase):
 		real_URL = ""
 		self.assertEqual(result, real_URL)
 		self.assertEqual(find_url('/assembly', peasoup), "invalid assembly" )
-		self.assertEqual(find_url('/assembly', chowder), "invalid assembly") 
+		self.assertEqual(find_url('/assembly', chowder), "invalid assembly")
+
+
 if __name__ == '__main__':
 	unittest.main()
 
