@@ -1,13 +1,16 @@
 import unittest
-
-
+from getNCBI_duplicate import find_url
+import codecs
 #test for empty href
 #test for no assembly
-class TestCalc(unitttest.Testcase):
+lemonrice = codecs.open("soup.html", 'r')
+peasoup = codecs.open("psoup.html", 'r')
+chowder = codecs.open("csoup.html", 'r')
+class TestCalc(unittest.TestCase):
 
 	def test_find_url(self):
 		result = find_url('/assembly', lemonrice)
-		real_URL = ""
+		real_URL = "https://www.ncbi.nlm.nih.gov/nuccore/NC_003888.3"
 		self.assertEqual(result, real_URL)
 		self.assertEqual(find_url('/assembly', peasoup), "invalid assembly" )
 		self.assertEqual(find_url('/assembly', chowder), "invalid assembly")
