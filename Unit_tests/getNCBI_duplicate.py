@@ -8,7 +8,13 @@ print("1")
 
 ## Base URL Of NCBI common to all URLS
 	temporaryURL = 'https://www.ncbi.nlm.nih.gov'
-    SOUP = codecs.open("soup.html", 'r')
+        # a good soup with /assmebly hrefs
+    lemonrice = codecs.open("soup.html", 'r')
+    # a gross soup with no /assembly(s)
+    peasoup = ""
+# # a soup that will make (me) sick invalid html
+    chowder = ""
+
 
 ## Function that finds first href that contain part of the urlPiece in the url. 
 def find_url(urlPiece, S):
