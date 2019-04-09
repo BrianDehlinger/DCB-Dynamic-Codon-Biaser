@@ -11,9 +11,9 @@ print("1")
         # a good soup with /assmebly hrefs
     lemonrice = codecs.open("soup.html", 'r')
     # a gross soup with no /assembly(s)
-    peasoup = ""
+    peasoup = codecs.open("psoup.html", 'r')
 # # a soup that will make (me) sick invalid html
-    chowder = ""
+    chowder = codecs.open("csoup.html", 'r')
 
 
 ## Function that finds first href that contain part of the urlPiece in the url. 
