@@ -40,25 +40,25 @@ o   Response time:
 Milestones: ******SUBJECT TO CHANGE WEEKLY****
 
 Milestone 1: Week of 3/19/2019
-§  Jared: Find optimal tool for codon bias calculation
-§  Karson: Find optimal tool for gene annotation
-§  Brian: Find optimal tool for web framework development
+§  Jared: Find optimal tool for codon bias calculation DONE 
+§  Karson: Find optimal tool for gene annotation DONE
+§  Brian: Find optimal tool for web framework development DONE
 Milestone 2: Week of 3/26/2019
-§  Get the Codon Bias Calculation code working properly
-§  Everyone should be comfortable using simple web framework development library by the following week
-§  User Interface should be clarified. Where will the buttons be? How will the user upload a genome? How will the user be guided along the process?
-§  We should begin thinking about how the program will actually look at the list of highly expressed gene’s and calculate the codon bias. Ideally, we can use an existing program to do this.
+§  Get the Codon Bias Calculation code working properly DONE
+§  Everyone should be comfortable using simple web framework development library by the following week DONE
+§  User Interface should be clarified. Where will the buttons be? How will the user upload a genome? How will the user be guided along the process? DONE
+§  We should begin thinking about how the program will actually look at the list of highly expressed gene’s and calculate the codon bias. Ideally, we can use an existing program to do this. DONE
 Milestone 3: Week of 4/2/2019:
-§  User Interface dummy code should be complete. This means that the buttons should all be there and should call dummy functions. The design pattern to do this will be the façade. It will wrap more complex functions into a pipelining function. The dummy functions will be replaced with the façade when other code is working properly. Tests should be written and completed as well ensuring that the proper functions are called when the button is pressed.
-§  Web application should be up as well with this user interface.
-§  The details on how the program will calculate code from Highly Expressed Gene’s should be ironed out by this point.
-§  The function that annotates a genome should be planned out at this point.
-§  The function that looks up the NCBI’s RefSeq genome should be planned out at this point.
+§  User Interface dummy code should be complete. This means that the buttons should all be there and should call dummy functions. The design pattern to do this will be the façade. It will wrap more complex functions into a pipelining function. The dummy functions will be replaced with the façade when other code is working properly. Tests should be written and completed as well ensuring that the proper functions are called when the button is pressed. DONE
+§  Web application should be up as well with this user interface. DONE
+§  The details on how the program will calculate code from Highly Expressed Gene’s should be ironed out by this point. DONE
+§  The function that annotates a genome should be planned out at this point. DONE
+§  The function that looks up the NCBI’s RefSeq genome should be planned out at this point. DONE
 Milestone 4: Week of 4/9/2019:
-o   A basic pipeline should be completed that does not interact with the web interface yet. A list of highly expressed genes should ingest by the program and the codon usage bias should be calculated for this genome.
+o   A basic pipeline should be completed that does not interact with the web interface yet. A list of highly expressed genes should ingest by the program and the codon usage bias should be calculated for this genome. NEARLY DONE
 Milestone 5: Week of 4/16/2019:
-o   A function that annotates a genome should be completed at this point.
-o   A function that looks up NCBI’s RefSeq genome, caches it, annotates it, deletes the original cache should be completed at this point.
+o   A function that annotates a genome should be completed at this point. 
+o   A function that looks up NCBI’s RefSeq genome, caches it, annotates it, deletes the original cache should be completed at this point. DONE
 Milestone 6: Week of 4/23/2019:
 §  A complete pipeline should be established where a user can upload a genome to the program and the program should output the codon usage bias.
 Milestone 7: Week of 4/30/2019:
@@ -92,14 +92,12 @@ Pipeline:
 Tasks in order of importance:
 Always: Code comments, Documentation of what you did to make something work, commands run, how to install stuff, work on documentation.
 
+DONE
 
-Write code that calculates RSCU from a lists of HEGs in fasta format. 
+
 Using python flask-uploads make dummy code that modifies a file a user submits and returns it in an html document to the user after 5 minutes.
-Implement the façade pattern to abstract complexity away from the user interface.
 Write code that annotates a fasta genome file.
-Write code that gets data from NCBI and annotates the genome fasta file.
 Write code that extracts the HEGs from an annotated genome file.
-Implement the façade pattern to abstract complexity away from the user interface.
 Map the user interface to the façade pattern functions(easy enough simply call the function)
 Write tests of User interface
 Write tests of codon usage calculation code
@@ -115,69 +113,11 @@ Find optimal tool for web application framework(COMPLETE)
 Find optimal tool for gene annotation(COMPLETE)
 Decide on User Interface Design(COMPLETE)
 Write Web Framework code such that calls on the website will be run natively on the server.(COMPLETE)
-
-
-Tasks by person:
-
-Brian:
-Beautify User Interface
-Add dynamic web page support using AJAX to run code live on a webpage(see translation example)
-Work on getting HEG file to fasta file(Everyone) 
-Try to break the code(Everyone)
+Write code that calculates RSCU from a lists of HEGs in fasta format. 
+Implement the façade pattern to abstract complexity away from the user interface.
 
 
 
-For this week: 
 
-Get codon usage Bias code working properly, plan out HEGs.
-
-
-Important interface code is below: discuss this week. It should be pretty good once we iron this out and discuss the purpose of abc.
-import abc
-
-class GeneralPipeline(abc.ABC):
-    def __init__(self, members):
-        self.members = members
-
-    ### Concrete method that should take fasta input files of the list of genes. We can code and test this now.
-    def get_bias(self, fasta):
-        print("get_bias has been called")
-
-    @abc.abstractmethod
-    ### This will vary. So far we have NCBI and a genome.
-    def get_data(self):
-        pass
-
-    @abc.abstractmethod
-    def gethegs(self):
-        pass
-
-    ## Concrete method that should be the same for all pipelines.
-    def output(self):
-        print("output has been called")
-
-
-class ncbi_pipe(GeneralPipeline):
-    def get_data(self):
-        print("ncbi get_data has been called")
-
-    ## Use Biopython to lookup the fasta file for a RefSeqID number. Input validation should be here as well. Make sure it is a fasta file.
-    def get_data_ncbi(self, accession):
-        print(accession)
-
-    def gethegs(self):
-        print("ncbi gethegs has been called")
-
-
-class genome_pipe(GeneralPipeline):
-
-
-class Facade:
-
-    def uploaded_genome(self):
-        pass
-
-    def ncbi(self, accession):
-        print(accession)
 
 
