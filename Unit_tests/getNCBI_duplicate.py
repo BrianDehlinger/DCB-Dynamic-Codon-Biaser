@@ -2,25 +2,27 @@ import requests
 import bs4
 import re
 import os
+import codecs
 #tests to see if and where code stops 
 print("1")
-## Gets the HTML file for the NCBI accession number of interest.
-def get_accession_data(accession):
-	the_request = requests.get("https://www.ncbi.nlm.nih.gov/nuccore/" + accession)
-	soup = bs4.BeautifulSoup(the_request.text)
-    
 
 ## Base URL Of NCBI common to all URLS
 	temporaryURL = 'https://www.ncbi.nlm.nih.gov'
+    SOUP = codecs.open("soup.html", 'r')
 
 ## Function that finds first href that contain part of the urlPiece in the url. 
-	def find_url(urlPiece, soup):
-		theURL = ''
-		for a in soup.find_all('a', href=True):
-			if('/assembly' in a['href']):
-				theURL = theURL + a['href']
-				break
-		return theURL
+def find_url(urlPiece, S):
+    theURL = ''
+    
+    try:
+    for a in soup.find_all('a', href=True):
+        if('/assembly' in a['href']):
+            theURL = theURL + a['href']
+            break
+    print(theURL)
+    
+    catch:
+    print("invalid assembly")
 
 
 
