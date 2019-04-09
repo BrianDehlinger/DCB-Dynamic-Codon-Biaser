@@ -19,7 +19,6 @@ def get_accession_data(accession):
                 if('/assembly' in a['href']):
                     theURL = theURL + a['href']
                     break
-
             return theURL
     except:
         print('failed attempt')
