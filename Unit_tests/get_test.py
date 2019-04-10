@@ -1,5 +1,6 @@
 import unittest
 from getNCBI_duplicate import find_url
+from getNCBI_duplicate import get_accession_data
 import codecs
 #test for empty href
 #test for no assembly
