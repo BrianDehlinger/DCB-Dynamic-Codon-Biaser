@@ -2,7 +2,7 @@ import abc
 from Bias import *
 from Bio import SeqIO
 import pandas
-#from NCBIGet import get_accession_data
+from NCBIGet import get_accession_data
 import os
 import csv
 
