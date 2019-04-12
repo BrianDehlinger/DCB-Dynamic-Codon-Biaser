@@ -10,11 +10,11 @@ print("1")
 temporaryURL = 'https://www.ncbi.nlm.nih.gov'
 #soup = ""
 #can I call a function within a function when testing??
-try:
-	def get_accession_data(accession):
-		the_request = requests.get("https://www.ncbi.nlm.nih.gov/nuccore/" + accession)
-		soup = bs4.BeautifulSoup(the_request.text)
+def get_accession_data(accession):
+	the_request = requests.get("https://www.ncbi.nlm.nih.gov/nuccore/" + accession)
+	soup = bs4.BeautifulSoup(the_request.text)
     
+	try:
 		def find_url(soup):
 			theURL = ""
 			for a in soup.find_all("a", href=True):
@@ -22,10 +22,11 @@ try:
 					theURL = theURL + a['href']
 					break
 			temp1 = 'https://www.ncbi.nlm.nih.gov' + theURL
-			print(temp1)
+			return(temp1)
 		find_url(soup)
-except:
-	print("invalid")
+	except:
+		print("invalid")
+
 
 
 get_accession_data('NC_003888.3')
