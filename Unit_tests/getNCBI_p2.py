@@ -26,6 +26,26 @@ try:
 		find_url(soup)
 except:
 	print("invalid")
+	
+	
+    temporaryURL2 = temporaryURL + find_url('/assembly', soup)
+    new_request = requests.get(temporaryURL2)
+    new_soup = bs4.BeautifulSoup(new_request.text)
+    items = new_soup.find("div", class_="rprt")
+
+## Get's the assembly URL and gets the assembly url HTML file.
+    temporaryURL2 = temporaryURL + find_url('/assembly', items)
+
+    new_request = requests.get(temporaryURL2)
+    new_soup = bs4.BeautifulSoup(new_request.text)
+
+## Searches for the FTP File folder in the assembly HTML webpage.
+    url = ''
+    items = new_soup.find_all('a', href=True)
+    for a in items:
+        if "ftp://" in a['href']:
+            url = a['href']
+            break
 
 
 get_accession_data('NC_003888.3')
