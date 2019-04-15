@@ -4,7 +4,11 @@ import re
 import os
 import codecs
 #tests to see if and where code stops 
-print("1")
+#print("1")
+
+
+#This is the first test portion that makes the first request 
+
 
 ## Base URL Of NCBI common to all URLS
 temporaryURL = 'https://www.ncbi.nlm.nih.gov'

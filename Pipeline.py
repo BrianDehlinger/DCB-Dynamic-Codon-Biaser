@@ -1,22 +1,42 @@
 import abc
-import Bias
+from Bias import *
 from Bio import SeqIO
 import pandas
 from NCBIGet import get_accession_data
 import os
+import csv
 
 class GeneralPipeline(abc.ABC):
     def __init__(self):
         self.file = ''
 
-    ### Concrete method that should take fasta input files of the list of genes. We can code and test this now.
+    ### Takes a fasta file as input.  Outputs a CSV file of the biases for each codon.
     def get_bias(self, fasta):
         index = CodonUsageTable(fasta)
         index.generate_rcsu_table()
         index.generate_nrcsu_table()
         index.generate_hegfb_table()
-        data = [index.rcsu_index, index.nrcsu_index, index.hegfb_index]
-        return data
+        matrix = [[0 for x in range(4)] for y in range(64)]
+        i = 0
+        for item in sorted(index.rcsu_index):
+            matrix[i][0] = item
+            matrix[i][1] = index.rcsu_index[item]
+            i += 1
+        i = 0
+        for item in sorted(index.nrcsu_index):
+            matrix[i][2] = index.nrcsu_index[item]
+            i += 1
+        i = 0
+        for item in sorted(index.hegfb_index):
+            matrix[i][3] = index.hegfb_index[item]
+            i += 1
+        with open(self.file + "bias.txt", 'w') as outcsv:
+            writer = csv.writer(outcsv)
+            writer.writerow(["Codon", "RCSU", "NRCSU", "HEG FB"])
+            for entry in matrix:
+                writer.writerow(entry)
+        outcsv.close()
+
 
     def clean_hegs(self):
         df = pandas.read_table("temp/matches", names=["Subject", "Bit", "SeqID"], skipinitialspace=True)
@@ -53,7 +73,6 @@ class NcbiPipe(GeneralPipeline):
     def get_data(self, accession):
         self.file = "temp/" + get_accession_data(accession)
 
-
 class GenomePipe(GeneralPipeline):
     
     def prodigal_it(self):
@@ -85,3 +104,7 @@ class Facade:
 facade = Facade()
 facade.ncbi('AE014075.1')
 facade.ncbi('AP018036.1')
+
+    def ncbi(self, accession):
+        print(accession)
+
