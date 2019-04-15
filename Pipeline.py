@@ -18,30 +18,6 @@ class GeneralPipeline(abc.ABC):
         data = [index.rcsu_index, index.nrcsu_index, index.hegfb_index]
         return data
 
-    @abc.abstractmethod
-    ### This will vary. So far we have NCBI and a genome.
-    def get_data(self):
-        pass
-
-    @abc.abstractmethod
-    def get_hegs(self):
-        pass
-
-    ## Concrete method that should be the same for all pipelines.
-    def output(self):
-        print("output has been called")
-
-
-class NcbiPipe(GeneralPipeline):
-    
-    ## This function downloads the genome from a refseq accession number
-    def get_data(self, accession):
-        self.file = "temp/" + get_accession_data(accession)
-	
-
-    def get_hegs(self):
-        os.system("./diamond blastx -d testDB -q " + self.file + " -o temp/matches -f 6 stitle bitscore qseqid -k 1")
-
     def clean_hegs(self):
         df = pandas.read_table("temp/matches", names=["Subject", "Bit", "SeqID"], skipinitialspace=True)
         df = df.replace('\[.*\]', '', regex=True)
@@ -57,26 +33,55 @@ class NcbiPipe(GeneralPipeline):
             if (seq_record.id in items):
                 print(seq_record)
                 newSeqs.append(seq_record)
-
+        print(len(newSeqs))
+        
 
         with open("temp/temporary.fasta", "w") as handle:
             SeqIO.write(newSeqs, handle, "fasta")
 
+    def get_hegs(self):
+        os.system("./diamond blastx -d testDB -q " + self.file + " -o temp/matches -f 6 stitle bitscore qseqid -k 1")
+
+    ## Concrete method that should be the same for all pipelines.
+    def output(self):
+        print("output has been called")
 
 
+class NcbiPipe(GeneralPipeline):
+    
+    ## This function downloads the genome from a refseq accession number
+    def get_data(self, accession):
+        self.file = "temp/" + get_accession_data(accession)
+
+
+class GenomePipe(GeneralPipeline):
+    
+    def prodigal_it(self):
+        os.system("prodigal -i temp/temporaryFile -o temp/tempGenes -f gff -d temp/theCDS")
+    
+    def get_data(self):
+        self.file = ("temp/theCDS")
+    
 
 class Facade:
 
-    def uploaded_genome(self, file):    
-        print("The genome was successfully uploaded")   
+    def uploaded_genome(self):
+        os.system("mkdir temp")  
+        genomepipe = GenomePipe()
+        genomepipe.prodigal_it()
+        genomepipe.get_data()
+        genomepipe.get_hegs()
+        genomepipe.clean_hegs()
+        genomepipe.output()
 
     def ncbi(self, accession):
-        print(accession)
+        ncbipipe = NcbiPipe()
+        ncbipipe.get_data(accession)
+        ncbipipe.get_hegs()
+        ncbipipe.clean_hegs()
+        ncbipipe.output()
 
 
-testPipe = NcbiPipe()
-testPipe.get_data("APNU00000000")
-testPipe.get_hegs()
-testPipe.clean_hegs()
-
-
+facade = Facade()
+facade.ncbi('AE014075.1')
+facade.ncbi('AP018036.1')

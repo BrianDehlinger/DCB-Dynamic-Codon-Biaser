@@ -21,7 +21,7 @@ def get_accession_data(accession):
                     break
             return theURL
     except:
-        print('failed attempt')
+        print('failed attempt, its possible the annotated file is not on NCBI. You may manually download the genome file and upload it via the other route if this is the case!')
 
 
 
