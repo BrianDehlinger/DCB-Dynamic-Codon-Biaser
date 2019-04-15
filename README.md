@@ -13,3 +13,7 @@ We have a fully assembled NCBI pipeline. We need to integrate this into the flas
 
 Then we can focus on improving the design of our code by refactoring, improving user interface, and then more stress testing.
 
+
+Note:
+
+Program runs in about 8.14 seconds on an averaged sized bacterial genome. 
