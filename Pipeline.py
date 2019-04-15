@@ -41,7 +41,6 @@ class GeneralPipeline(abc.ABC):
     def clean_hegs(self):
         df = pandas.read_table("temp/matches", names=["Subject", "Bit", "SeqID"], skipinitialspace=True)
         df = df.replace('\[.*\]', '', regex=True)
-        print(df.head())
         df["Subject"] = df["Subject"].str.strip()
         df["Subject"] = df["Subject"].apply(lambda x: ' '.join(x.split(' ')[1:]))
         df = df.replace("elongation factor EF-2", "elongation factor G")
@@ -91,20 +90,19 @@ class Facade:
         genomepipe.get_data()
         genomepipe.get_hegs()
         genomepipe.clean_hegs()
-        genomepipe.output()
+        genomepipe.get_bias('temp/temporary.fasta')
 
     def ncbi(self, accession):
         ncbipipe = NcbiPipe()
         ncbipipe.get_data(accession)
         ncbipipe.get_hegs()
         ncbipipe.clean_hegs()
-        ncbipipe.output()
+        ncbipipe.get_bias('temp/temporary.fasta')
 
 
 facade = Facade()
-facade.ncbi('AE014075.1')
-facade.ncbi('AP018036.1')
+facade.ncbi('CP014099.2')
 
-    def ncbi(self, accession):
-        print(accession)
+def ncbi(self, accession):
+    print(accession)
 
