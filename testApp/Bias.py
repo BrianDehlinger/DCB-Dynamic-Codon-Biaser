@@ -10,7 +10,7 @@ from __future__ import print_function
 
 import math
 from Bio import SeqIO  # To parse a FASTA file
-
+import warnings
 
 CodonsDict = {
     'TTT': 0, 'TTC': 0, 'TTA': 0, 'TTG': 0, 'CTT': 0,
@@ -198,8 +198,9 @@ class CodonUsageTable(object):
                         self.codon_count[codon] += 1
                         self.total_codons += 1
                     else:
-                        raise TypeError("illegal codon %s in gene: %s"
+                        warnings.warn("Illegal codon %s in gene: %s. The bias data may be inaccurate"
                                         % (codon, cur_record.id))
+
 
     def print_rcsu_table(self):
         """Print out the RCSU table.
