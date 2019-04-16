@@ -105,12 +105,10 @@ class Facade:
         ncbipipe.get_bias('temp/temporary.fasta')
 
 
-'''
 facade = Facade()
 start = timer()
-facade.ncbi('CP014099.2')
+facade.ncbi('NC_011586')
 end = timer()
 print(end - start)
-'''
 
 
