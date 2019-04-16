@@ -31,7 +31,7 @@ class GeneralPipeline(abc.ABC):
         for item in sorted(index.hegfb_index):
             matrix[i][3] = index.hegfb_index[item]
             i += 1
-        with open(self.file + "bias.txt", 'w') as outcsv:
+        with open(self.file + ".bias.txt", 'w') as outcsv:
             writer = csv.writer(outcsv)
             writer.writerow(["Codon", "RCSU", "NRCSU", "HEG FB"])
             for entry in matrix:
