@@ -31,13 +31,12 @@ class GeneralPipeline(abc.ABC):
         for item in sorted(index.hegfb_index):
             matrix[i][3] = index.hegfb_index[item]
             i += 1
-        with open(self.file + "bias.txt", 'w') as outcsv:
+        with open(self.file + ".bias.txt", 'w') as outcsv:
             writer = csv.writer(outcsv)
             writer.writerow(["Codon", "RCSU", "NRCSU", "HEG FB"])
             for entry in matrix:
                 writer.writerow(entry)
         outcsv.close()
-
 
     def clean_hegs(self):
         df = pandas.read_table("temp/matches", names=["Subject", "Bit", "SeqID"], skipinitialspace=True)
@@ -103,7 +102,7 @@ class Facade:
 
 facade = Facade()
 start = timer()
-facade.ncbi('CP014099.2')
+facade.ncbi('NC_011586')
 end = timer()
 print(end - start)
 
