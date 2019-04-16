@@ -68,8 +68,6 @@ class CodonUsageTable(object):
         self.nrcsu_index = {}
         self.hegfb_index = {}
         self.codon_count = {}
-        self.total_codons = 0
-
 
     def generate_rcsu_table(self):
         """Generate a codon usage table from a FASTA file of CDS sequences.
@@ -196,7 +194,6 @@ class CodonUsageTable(object):
                     codon = dna_sequence[i:i + 3]
                     if codon in self.codon_count:
                         self.codon_count[codon] += 1
-                        self.total_codons += 1
                     else:
                         raise TypeError("illegal codon %s in gene: %s"
                                         % (codon, cur_record.id))
