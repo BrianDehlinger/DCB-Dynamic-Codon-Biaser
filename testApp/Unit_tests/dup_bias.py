@@ -106,9 +106,9 @@ class CodonUsageTable(object):
             # now add the RCSU values to the table
             for codon_index, codon in enumerate(codons):
                 self.rcsu_index[codon] = round(rcsu[codon_index],6)
+        print(rcsu)
 
-def generate_nrcsu_table(self):
-    """Generate a codon usage table from a FASTA file of CDS sequences.
+  """Generate a codon usage table from a FASTA file of CDS sequences.
         
         Takes a location of a Fasta file containing CDS sequences
         (which must all have a whole number of codons) and generates a codon
@@ -116,41 +116,35 @@ def generate_nrcsu_table(self):
         
         NRCSU values
         """
-            # first make sure we're not overwriting an existing NRSCU table:
-            if self.nrcsu_index != {}:
-            raise ValueError("an NRSCU index has already been set")
+def generate_nrcsu_table(self):
+  # first make sure we're not overwriting an existing NRSCU table:
+	if self.nrcsu_index != {}:
+		raise ValueError("an NRSCU index has already been set")
                 # count codon occurrences in the file.
-                self._count_codons(self.handle)
+    self._count_codons(self.handle)
                 
                 # now to calculate the index we first need to sum the number of times
                 # synonymous codons were used all together.
-                for aa in SynonymousCodons:
-                    total = 0.0
-                        # NRCSU values are CodonCount/sum of all synonymous codons
-                        nrcsu = []
-                        codons = SynonymousCodons[aa]
-                        
-                        for codon in codons:
-                            total += self.codon_count[codon]
-                                
-                                # calculate the NRSCU value for each of the codons
-                                for codon in codons:
-                                    denominator = float(total)
-                                    nrcsu.append(self.codon_count[codon] / denominator)
-                                        
-                                        # now add the NRCSU values to the table
-                                        for codon_index, codon in enumerate(codons):
-                                            self.nrcsu_index[codon] = round(nrcsu[codon_index], 6)
+    for aa in SynonymousCodons:
+        total = 0.0# NRCSU values are CodonCount/sum of all synonymous codons
+        nrcsu = []
+        codons = SynonymousCodons[aa]
+        for codon in codons:
+        	total += self.codon_count[codon]# calculate the NRSCU value for each of the codons
+            	for codon in codons:
+                    denominator = float(total)
+					nrcsu.append(self.codon_count[codon] / denominator)# now add the NRCSU values to the table
+                    for codon_index, codon in enumerate(codons):
+                    	self.nrcsu_index[codon] = round(nrcsu[codon_index], 6)
 
 def generate_hegfb_table(self):
-    """Generate a codon usage table from a FASTA file of CDS sequences.
+"""Generate a codon usage table from a FASTA file of CDS sequences.
         
         Takes a location of a Fasta file containing CDS sequences
         (which must all have a whole number of codons) and generates a codon
         usage table for HEG FB values.
         
-        HEG FB values
-        """
+        HEG FB values"""
             # first make sure we're not overwriting an existing HEG FB table:
             if self.hegfb_index != {}:
             raise ValueError("an HEG FB index has already been set")
@@ -177,7 +171,7 @@ def generate_hegfb_table(self):
                                         # now add the HEG FB values to the table
                                         for codon_index, codon in enumerate(codons):
                                             self.hegfb_index[codon] = round(hegfb[codon_index], 9)
-
+                print(hegfb)
 
 def _count_codons(self, fasta_file):
     with open(fasta_file, 'r') as handle:
@@ -200,6 +194,7 @@ def _count_codons(self, fasta_file):
                     else:
                         raise TypeError("illegal codon %s in gene: %s"
                                         % (codon, cur_record.id))
+                                        
 
 def print_rcsu_table(self):
     """Print out the RCSU table.
