@@ -31,7 +31,7 @@ class GeneralPipeline(abc.ABC):
         for item in sorted(index.hegfb_index):
             matrix[i][3] = index.hegfb_index[item]
             i += 1
-        with open(self.file + "bias.txt", 'w') as outcsv:
+        with open(self.file + ".bias.txt", 'w') as outcsv:
             writer = csv.writer(outcsv)
             writer.writerow(["Codon", "RCSU", "NRCSU", "HEG FB"])
             for entry in matrix:
@@ -104,10 +104,9 @@ class Facade:
         ncbipipe.clean_hegs()
         ncbipipe.get_bias('temp/temporary.fasta')
 
-
 facade = Facade()
 start = timer()
-facade.ncbi('NC_011586')
+facade.ncbi('APNU00000000')
 end = timer()
 print(end - start)
 
