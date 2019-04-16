@@ -38,7 +38,6 @@ class GeneralPipeline(abc.ABC):
                 writer.writerow(entry)
         outcsv.close()
 
-
     def clean_hegs(self):
         df = pandas.read_table("temp/matches", names=["Subject", "Bit", "SeqID"], skipinitialspace=True)
         df = df.replace('\[.*\]', '', regex=True)
