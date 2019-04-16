@@ -104,7 +104,7 @@ class CodonUsageTable(object):
 
             # now add the RCSU values to the table
             for codon_index, codon in enumerate(codons):
-                self.rcsu_index[codon] = round(rcsu[codon_index],3)
+                self.rcsu_index[codon] = round(rcsu[codon_index],6)
 
     def generate_nrcsu_table(self):
         """Generate a codon usage table from a FASTA file of CDS sequences.
@@ -139,7 +139,7 @@ class CodonUsageTable(object):
 
             # now add the NRCSU values to the table
             for codon_index, codon in enumerate(codons):
-                self.nrcsu_index[codon] = round(nrcsu[codon_index], 3)
+                self.nrcsu_index[codon] = round(nrcsu[codon_index], 6)
 
     def generate_hegfb_table(self):
         """Generate a codon usage table from a FASTA file of CDS sequences.
