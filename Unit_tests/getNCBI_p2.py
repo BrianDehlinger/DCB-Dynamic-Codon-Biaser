@@ -33,7 +33,10 @@ def get_accession_data(accession):
 	new_request = requests.get(temporaryURL2)
 	new_soup = bs4.BeautifulSoup(new_request.text)
 	items = new_soup.find("div", class_="rprt")
-#	ERRORS START HERE :)
+	print(items)
+#ERRORS START HERE :)
+
+	endhere()
 ## Get's the assembly URL and gets the assembly url HTML file.
 	temporaryURL2 = temporaryURL + find_url(items)
 
