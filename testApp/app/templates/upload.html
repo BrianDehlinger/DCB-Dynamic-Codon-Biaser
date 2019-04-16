@@ -1,0 +1,20 @@
+<!doctype html>
+<html>
+	<body>
+		{% with messages = get_flashed_messages() %}
+			{% if messages %}
+				{% for message in messages %}
+					{{ message }}
+				{% endfor %}	
+			{% endif %}
+		{% endwith %}
+
+		<form action = "http://localhost:5000/uploader" method = "POST"
+			enctype = "multipart/form-data">
+		<input type = "file" name = "file" />
+		<input type = "submit"/>
+		</form>
+
+	</body>
+</html>
+

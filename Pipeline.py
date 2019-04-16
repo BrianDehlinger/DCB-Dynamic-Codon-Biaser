@@ -5,6 +5,7 @@ import pandas
 from NCBIGet import get_accession_data
 import os
 import csv
+from timeit import default_timer as timer
 
 class GeneralPipeline(abc.ABC):
     def __init__(self):
@@ -101,8 +102,8 @@ class Facade:
 
 
 facade = Facade()
+start = timer()
 facade.ncbi('CP014099.2')
-
-def ncbi(self, accession):
-    print(accession)
+end = timer()
+print(end - start)
 
