@@ -10,6 +10,7 @@ from timeit import default_timer as timer
 class GeneralPipeline(abc.ABC):
     def __init__(self):
         self.file = ''
+        self.error_string = ""
 
     ### Takes a fasta file as input.  Outputs a CSV file of the biases for each codon.
     def get_bias(self, fasta):
@@ -37,6 +38,8 @@ class GeneralPipeline(abc.ABC):
             for entry in matrix:
                 writer.writerow(entry)
         outcsv.close()
+	if index.codon_exception = True:
+            self.error_string = "Illegal Codon in File; data may be inaccurate."
 
 
     def clean_hegs(self):
