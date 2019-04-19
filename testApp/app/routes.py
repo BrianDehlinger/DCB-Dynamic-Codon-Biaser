@@ -1,10 +1,11 @@
 from app import app
-from flask import redirect, url_for, request, render_template, flash, request, make_response, request
+from flask import redirect, url_for, request, render_template, flash, request, make_response, request, send_file
 import os
+from Bio import Entrez
 from Pipeline import Facade
 from werkzeug.utils import secure_filename
 
-ALLOWED = set(['txt', 'fna'])
+ALLOWED = set(['txt', 'fna', 'fasta'])
 
 def allowed_file(filename):
 	return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED
@@ -29,8 +30,19 @@ def ncbi():
 def my_form_post():
 	if request.method == 'POST':
 		text = request.form['text']
-		print(text)
-		return redirect(url_for('ncbi'))
+		facade = Facade()
+		try:
+			Entrez.email = "bdehlinger@luc.edu"	
+			handle = Entrez.efetch(db="nucleotide", id=text)
+		except:
+			flash('The RefSeq Accession number is invalid')
+			return redirect('/ncbi')
+		try:
+			facade.ncbi(text)
+			return send_file(facade.file, as_attachment=True)
+		except:
+			flash('There was an error, please make sure the RefSeq Accession has an assembly, and is for a complete bacterial genome. Please notify the administrator of any other errors!')
+			return redirect('/ncbi')
 
 @app.route('/upload', methods=['POST', 'GET'])
 def upload():
@@ -53,7 +65,9 @@ def uploader():
 			flash('Your file has successfully been uploaded to the server')
 			facade = Facade()
 			facade.uploaded_genome()
-			return redirect('/index')
+			response = make_reponse(result)
+			response.headers["Content-Disposition"] = "attachment; filename=result.csv"
+			return response
 
 
 

@@ -1,6 +1,6 @@
 from flask import Flask
 
-UPLOAD_FOLDER = r"/home/briand/DCB-Dynamic-Codon-Bias/testApp/"
+UPLOAD_FOLDER = r"/home/bdehlinger/DCB-Dynamic-Codon-Bias/testApp/"
 app = Flask(__name__)
 app.secret_key = "dragon"
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER

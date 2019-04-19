@@ -1,8 +1,21 @@
 <html>
-	<form action = "http://localhost:5000/ncbidata" method="POST"
-		enctype = multipart/form-data">
-		<input name="text">
-		<input type="submit>
-	</form>
+	<body>
+		{% with messages = get_flashed_messages() %}
+				{% if messages %}
+					{% for message in messages %}
+						{{ message }}
+					{% endfor %}	
+				{% endif %}
+		{% endwith %}
+		<form action = "http://localhost:5000/ncbidata" method="POST" onsubmit="myFunction()" enctype = "multipart/form-data">
+			<input name="text">
+			<input type="submit">
+		</form>
+		<script>	
+			function myFunction() {
+				alert("Uploaded please wait!");
+			}
+		</script>
+	</body>
 </html>
 

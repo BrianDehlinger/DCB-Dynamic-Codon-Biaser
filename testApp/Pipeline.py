@@ -38,7 +38,7 @@ class GeneralPipeline(abc.ABC):
             for entry in matrix:
                 writer.writerow(entry)
         outcsv.close()
-	if index.codon_exception = True:
+        if index.codon_exception == True:
             self.error_string = "Illegal Codon in File; data may be inaccurate."
 
 
@@ -75,6 +75,7 @@ class NcbiPipe(GeneralPipeline):
     ## This function downloads the genome from a refseq accession number
     def get_data(self, accession):
         self.file = "temp/" + get_accession_data(accession)
+        print(self.file)
 
 class GenomePipe(GeneralPipeline):
     
@@ -97,6 +98,7 @@ class Facade:
         genomepipe.get_hegs()
         genomepipe.clean_hegs()
         genomepipe.get_bias('temp/temporary.fasta')
+        self.file = os.getcwd() + "/" +  genomepipe.file + ".bias.txt"
 
     def ncbi(self, accession):
         os.system("rm -rf temp")
@@ -106,11 +108,12 @@ class Facade:
         ncbipipe.get_hegs()
         ncbipipe.clean_hegs()
         ncbipipe.get_bias('temp/temporary.fasta')
-
+        self.file = os.getcwd() + "/" +  ncbipipe.file + ".bias.txt"
+'''
 facade = Facade()
 start = timer()
-facade.ncbi('APNU00000000')
+facade.ncbi('ABAW00000000')
 end = timer()
 print(end - start)
-
+'''
 
