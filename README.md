@@ -1,17 +1,26 @@
 # DCB-Dynamic-Codon-Bias
 A tool for dynamically calculating the codon usage bias in bacterial genomes.
 
+Dependenices:
 
-Currently:
+In order for this code to work properly the following are needed:
 
-We have a fully assembled NCBI pipeline. We need to integrate this into the flask web applicatiojn, clean code up, comment, bug find/fix, and lastly beautify the interface. 
+Linux OS
+Python version 3 with:
+    Biopython
+    BeautifulSoup4
+    Pandas
+    NumPy
+    flask
 
+Prodigal
 
-2) Bugfix and make code softer.
-3) Make the file output to HTML
-4) Input validation
-
-Then we can focus on improving the design of our code by refactoring, improving user interface, and then more stress testing.
+In order to configure the program to run properly:
+  1) Manually go into your folder DCB-Dynamic-Codon-Bias/testApp/app/__init__.py
+  2) Manually configure the UPLOAD_FOLDER name to wherever the cloned repo is.
+  3) Configure the MAX_CONTENT_LENGTH to desired max upload size. 16MB is 16 * 1024 *1024. Whereas 18MB is 18 * 1024 * 1024.
+  4) Change into the 
+  
 
 
 Note:
