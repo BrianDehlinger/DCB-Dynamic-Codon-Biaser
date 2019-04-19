@@ -41,7 +41,9 @@ class GeneralPipeline(abc.ABC):
         if index.codon_exception == True:
             self.error_string = "Illegal Codon in File; data may be inaccurate."
 
-
+    ## Reads in the matches from diamond. This function then cleans up and standarizes the output so that there are at most 40 highly expressed 
+    ## Genes in an output file called temporary.fasta. Elongation factor EF-2 is replaced with elongation factor G because they are actually
+    ## the same protein. 
     def clean_hegs(self):
         df = pandas.read_table("temp/matches", names=["Subject", "Bit", "SeqID"], skipinitialspace=True)
         df = df.replace('\[.*\]', '', regex=True)
@@ -56,12 +58,13 @@ class GeneralPipeline(abc.ABC):
             if (seq_record.id in items):
                 print(seq_record)
                 newSeqs.append(seq_record)
-        print(len(newSeqs))
-        
 
         with open("temp/temporary.fasta", "w") as handle:
             SeqIO.write(newSeqs, handle, "fasta")
-
+        return len(newSeqs)
+    ## Uses DIAMOND on the database called testDB that contains a database assembled from the identical protein groups NCBI database of the
+    ## 40 highly expressed genes in bacteria. Outputs a file called matches with the sequence title, bitscore, and query sequence id. K is specified to avoid redundancy and get 
+    ## the top hit for each query. 
     def get_hegs(self):
         os.system("./diamond blastx -d testDB -q " + self.file + " -o temp/matches -f 6 stitle bitscore qseqid -k 1")
 
@@ -72,22 +75,29 @@ class GeneralPipeline(abc.ABC):
 
 class NcbiPipe(GeneralPipeline):
     
-    ## This function downloads the genome from a refseq accession number
+    ## This function downloads the genome from a refseq accession number. It delegates work to the get_accession_data method from the NCBIGet module.
+    ## Self.file is the file name of the downloaded fasta file. 
     def get_data(self, accession):
         self.file = "temp/" + get_accession_data(accession)
-        print(self.file)
+        
 
 class GenomePipe(GeneralPipeline):
     
+    ## Prodigal is run on the temporaryFile(which is what the uploaded genome is called). the -d flag specifies to output a file containing all of the found protein coding sequences found. 
     def prodigal_it(self):
         os.system("prodigal -i temp/temporaryFile -o temp/tempGenes -f gff -d temp/theCDS")
-    
+        
+   ## The list of protein coding sequences is called theCDS in this case. Diamond will use this as a query sequence. 
     def get_data(self):
         self.file = ("temp/theCDS")
     
-
+## This class is to simplify access in the actual flask application. It abstracts complexity away. 
 class Facade:
-
+    
+    ## This function is called when a user decides to upload a genome. First any temporary folder is removed. A new temporary folder is made. The 
+    ## temporaryFile that was uploaded is moved to this temporary folder. A Genome Pipeline is created. Prodigal is run on the data. The file name is set with get_data. 
+    ## Diamond is run with get_hegs. Clean_hegs standardizes the output. Get_bias returns a csv file into the temporary directoy. Self.file is changed in order to allow flask to actually
+    ## return the csv. 
     def uploaded_genome(self):
         os.system("rm -rf temp")
         os.system("mkdir temp")
@@ -109,11 +119,5 @@ class Facade:
         ncbipipe.clean_hegs()
         ncbipipe.get_bias('temp/temporary.fasta')
         self.file = os.getcwd() + "/" +  ncbipipe.file + ".bias.txt"
-'''
-facade = Facade()
-start = timer()
-facade.ncbi('ABAW00000000')
-end = timer()
-print(end - start)
-'''
+
 
