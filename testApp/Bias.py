@@ -172,7 +172,7 @@ class CodonUsageTable(object):
             # calculate the HEG FB value for each of the codons
             ## THIS CALCULATION IS INCORRECT!
             for codon in codons:
-                denominator = float(total) * self.total_codons
+                denominator = self.total_codons
                 hegfb.append(self.codon_count[codon] / denominator)
 
             # now add the HEG FB values to the table
