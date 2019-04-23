@@ -53,7 +53,7 @@ def upload():
 def uploader():
 	if request.method == 'POST':
 		if 'file' not in request.files:
-			print("ERROR FILE NOT IN REQUEST.FILES")
+			flash("File not found!")
 			return redirect('/upload')
 		file = request.files['file']
 		if file.filename == '':
@@ -61,13 +61,17 @@ def uploader():
 			return redirect('/upload')
 		if file and allowed_file(file.filename):
 			filename = "temporaryFile"
-			file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-			flash('Your file has successfully been uploaded to the server')
-			facade = Facade()
-			facade.uploaded_genome()
-			response = make_reponse(result)
-			response.headers["Content-Disposition"] = "attachment; filename=result.csv"
-			return response
+			try:
+				file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+				facade = Facade()
+				facade.uploaded_genome()
+				response = make_reponse(result)
+				response.headers["Content-Disposition"] = "attachment; filename=result.csv"
+				return response
+			except:
+				flash("There was an error! Please make sure file is in nucleotide fasta format and is a complete genome!")
+				return redirect('/upload')
+
 
 
 
