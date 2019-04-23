@@ -85,7 +85,8 @@ class CodonUsageTable(object):
         if self.rcsu_index != {}:
             raise ValueError("an RSCU index has already been set")
         # count codon occurrences in the file.
-        self._count_codons(self.handle)
+        if self.total_codons == 0:
+            self._count_codons(self.handle)
 
         # now to calculate the table we first need to sum the number of times
         # synonymous codons were used all together.
@@ -121,7 +122,8 @@ class CodonUsageTable(object):
         if self.nrcsu_index != {}:
             raise ValueError("an NRSCU index has already been set")
         # count codon occurrences in the file.
-        self._count_codons(self.handle)
+        if self.total_codons == 0:
+            self._count_codons(self.handle)
 
         # now to calculate the index we first need to sum the number of times
         # synonymous codons were used all together.
@@ -156,7 +158,8 @@ class CodonUsageTable(object):
         if self.hegfb_index != {}:
             raise ValueError("an HEG FB index has already been set")
         # count codon occurrences in the file.
-        self._count_codons(self.handle)
+        if self.total_codons == 0:
+            self._count_codons(self.handle)
 
         # now to calculate the index we first need to sum the number of times
         # synonymous codons were used all together.
