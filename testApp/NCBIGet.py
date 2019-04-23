@@ -65,6 +65,3 @@ def get_accession_data(accession):
     return lastPieceOfUrl + "_cds_from_genomic.fna"
 
 
-
-
-get_accession_data('APNU00000000')

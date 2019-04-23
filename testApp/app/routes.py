@@ -62,13 +62,13 @@ def uploader():
 		if file and allowed_file(file.filename):
 			filename = "temporaryFile"
 			try:
-				file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+				theSecureName = secure_filename(file.filename)
+				file.save(os.path.join(app.config['UPLOAD_FOLDER'], theSecureName))
 				facade = Facade()
-				facade.uploaded_genome()
-				response = make_reponse(result)
-				response.headers["Content-Disposition"] = "attachment; filename=result.csv"
-				return response
-			except:
+				facade.uploaded_genome(theSecureName, file.filename)
+				return send_file(facade.file, as_attachment=True)
+			except TypeError as e:
+				print(e)
 				flash("There was an error! Please make sure file is in nucleotide fasta format and is a complete genome!")
 				return redirect('/upload')
 

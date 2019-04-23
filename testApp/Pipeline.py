@@ -13,7 +13,7 @@ class GeneralPipeline(abc.ABC):
         self.error_string = ""
 
     ### Takes a fasta file as input.  Outputs a CSV file of the biases for each codon.
-    def get_bias(self, fasta):
+    def get_bias(self, fasta, filename):
         index = CodonUsageTable(fasta)
         index.generate_rcsu_table()
         index.generate_nrcsu_table()
@@ -32,8 +32,9 @@ class GeneralPipeline(abc.ABC):
         for item in sorted(index.hegfb_index):
             matrix[i][3] = index.hegfb_index[item]
             i += 1
-        with open(self.file + ".bias.txt", 'w') as outcsv:
+        with open(filename + ".bias.csv", 'w') as outcsv:
             writer = csv.writer(outcsv)
+            writer.writerow([filename])
             writer.writerow(["Codon", "RCSU", "NRCSU", "HEG FB"])
             for entry in matrix:
                 writer.writerow(entry)
@@ -68,10 +69,6 @@ class GeneralPipeline(abc.ABC):
     def get_hegs(self):
         os.system("./diamond blastx -d testDB -q " + self.file + " -o temp/matches -f 6 stitle bitscore qseqid -k 1")
 
-    ## Concrete method that should be the same for all pipelines.
-    def output(self):
-        print("output has been called")
-
 
 class NcbiPipe(GeneralPipeline):
     
@@ -84,12 +81,12 @@ class NcbiPipe(GeneralPipeline):
 class GenomePipe(GeneralPipeline):
     
     ## Prodigal is run on the temporaryFile(which is what the uploaded genome is called). the -d flag specifies to output a file containing all of the found protein coding sequences found. 
-    def prodigal_it(self):
-        os.system("prodigal -i temp/temporaryFile -o temp/tempGenes -f gff -d temp/theCDS")
+    def prodigal_it(self, filename):
+        os.system("prodigal -i temp/" + filename + " -o temp/tempGenes -f gff -d temp/" + filename + "CDS")
         
    ## The list of protein coding sequences is called theCDS in this case. Diamond will use this as a query sequence. 
-    def get_data(self):
-        self.file = ("temp/theCDS")
+    def get_data(self, filename):
+        self.file = ("temp/" + filename + "CDS")
     
 ## This class is to simplify access in the actual flask application. It abstracts complexity away. 
 class Facade:
@@ -98,17 +95,17 @@ class Facade:
     ## temporaryFile that was uploaded is moved to this temporary folder. A Genome Pipeline is created. Prodigal is run on the data. The file name is set with get_data. 
     ## Diamond is run with get_hegs. Clean_hegs standardizes the output. Get_bias returns a csv file into the temporary directoy. Self.file is changed in order to allow flask to actually
     ## return the csv. 
-    def uploaded_genome(self):
+    def uploaded_genome(self, filename, originalfilename):
         os.system("rm -rf temp")
         os.system("mkdir temp")
-        os.system("mv temporaryFile temp") 
+        os.system("mv " + filename + " temp")
         genomepipe = GenomePipe()
-        genomepipe.prodigal_it()
-        genomepipe.get_data()
+        genomepipe.prodigal_it(filename)
+        genomepipe.get_data(filename)
         genomepipe.get_hegs()
         genomepipe.clean_hegs()
-        genomepipe.get_bias('temp/temporary.fasta')
-        self.file = os.getcwd() + "/" +  genomepipe.file + ".bias.txt"
+        genomepipe.get_bias('temp/temporary.fasta', originalfilename)
+        self.file = os.getcwd() + "/" +  originalfilename + ".bias.csv"
 
     def ncbi(self, accession):
         os.system("rm -rf temp")
@@ -117,7 +114,8 @@ class Facade:
         ncbipipe.get_data(accession)
         ncbipipe.get_hegs()
         ncbipipe.clean_hegs()
-        ncbipipe.get_bias('temp/temporary.fasta')
-        self.file = os.getcwd() + "/" +  ncbipipe.file + ".bias.txt"
+        ncbipipe.get_bias('temp/temporary.fasta', accession)
+        self.file = os.getcwd() + "/" +  accession + ".bias.csv"
+
 
 
