@@ -69,7 +69,7 @@ class CodonUsageTable(object):
         self.hegfb_index = {}
         self.codon_count = {}
         self.total_codons = 0
-        self.codon_exception = False
+        self.codon_exception = []
 
 
     def generate_rcsu_table(self):
@@ -202,7 +202,7 @@ class CodonUsageTable(object):
                         self.codon_count[codon] += 1
                         self.total_codons += 1
                     else:
-                        self.codon_exception = True
+                        self.codon_exception.append("Illegal codon %s in gene %s, this data may be inaccurate!" % (codon, cur_record.id))
 
     def print_rcsu_table(self):
         """Print out the RCSU table.
