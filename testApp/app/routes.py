@@ -67,7 +67,9 @@ def uploader():
 				file.save(os.path.join(app.config['UPLOAD_FOLDER'], theSecureName))
 				facade = Facade()
 				facade.uploaded_genome(theSecureName, file.filename)
-				return send_file(facade.file, as_attachment=True)
+				print(facade.file)
+				os.system("zip temp/" + str(file.filename) + ".zip " + facade.file + " temp/temporary.fasta")
+				return send_file(app.config['UPLOAD_FOLDER'] + "/temp/" + file.filename +  ".zip", as_attachment=True)
 			except TypeError as e:
 				print(e)
 				flash("There was an error! Please make sure file is in nucleotide fasta format and is a complete genome!")
