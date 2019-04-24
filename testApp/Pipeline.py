@@ -10,7 +10,6 @@ from timeit import default_timer as timer
 class GeneralPipeline(abc.ABC):
     def __init__(self):
         self.file = ''
-        self.error_string = ""
 
     ### Takes a fasta file as input.  Outputs a CSV file of the biases for each codon.
     def get_bias(self, fasta, filename):
@@ -34,13 +33,13 @@ class GeneralPipeline(abc.ABC):
             i += 1
         with open("temp/" + filename + ".bias.csv", 'w') as outcsv:
             writer = csv.writer(outcsv)
-            writer.writerow([filename])
+            if index.codon_exception != []:
+                for line in index.codon_exception:
+                    writer.writerow([line])
             writer.writerow(["Codon", "RCSU", "NRCSU", "HEG FB"])
             for entry in matrix:
                 writer.writerow(entry)
         outcsv.close()
-        if index.codon_exception == True:
-            self.error_string = "Illegal Codon in File; data may be inaccurate."
 
     ## Reads in the matches from diamond. This function then cleans up and standarizes the output so that there are at most 40 highly expressed 
     ## Genes in an output file called temporary.fasta. Elongation factor EF-2 is replaced with elongation factor G because they are actually
@@ -106,7 +105,6 @@ class Facade:
         genomepipe.clean_hegs()
         genomepipe.get_bias('temp/temporary.fasta', originalfilename)
         self.file = os.getcwd() + "/temp/" +  originalfilename + ".bias.csv"
-        self.error_string = genomepipe.error_string
 
     def ncbi(self, accession):
         os.system("rm -rf temp")
@@ -117,7 +115,6 @@ class Facade:
         ncbipipe.clean_hegs()
         ncbipipe.get_bias('temp/temporary.fasta', accession)
         self.file = os.getcwd() + "/temp/" +  accession + ".bias.csv"
-        self.error_string = ncbipipe.error_string
 
 
 
