@@ -40,7 +40,8 @@ def my_form_post():
 		try:
 			facade.ncbi(text)
 			return send_file(facade.file, as_attachment=True)
-		except:
+		except TypeError as e:
+			print(e)
 			flash('There was an error, please make sure the RefSeq Accession has an assembly, and is for a complete bacterial genome. Please notify the administrator of any other errors!')
 			return redirect('/ncbi')
 

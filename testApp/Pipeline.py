@@ -32,7 +32,7 @@ class GeneralPipeline(abc.ABC):
         for item in sorted(index.hegfb_index):
             matrix[i][3] = index.hegfb_index[item]
             i += 1
-        with open(filename + ".bias.csv", 'w') as outcsv:
+        with open("temp/" + filename + ".bias.csv", 'w') as outcsv:
             writer = csv.writer(outcsv)
             writer.writerow([filename])
             writer.writerow(["Codon", "RCSU", "NRCSU", "HEG FB"])
@@ -105,7 +105,8 @@ class Facade:
         genomepipe.get_hegs()
         genomepipe.clean_hegs()
         genomepipe.get_bias('temp/temporary.fasta', originalfilename)
-        self.file = os.getcwd() + "/" +  originalfilename + ".bias.csv"
+        self.file = os.getcwd() + "/temp/" +  originalfilename + ".bias.csv"
+        self.error_string = genomepipe.error_string
 
     def ncbi(self, accession):
         os.system("rm -rf temp")
@@ -115,7 +116,8 @@ class Facade:
         ncbipipe.get_hegs()
         ncbipipe.clean_hegs()
         ncbipipe.get_bias('temp/temporary.fasta', accession)
-        self.file = os.getcwd() + "/" +  accession + ".bias.csv"
+        self.file = os.getcwd() + "/temp/" +  accession + ".bias.csv"
+        self.error_string = ncbipipe.error_string
 
 
 
