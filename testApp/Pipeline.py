@@ -104,7 +104,8 @@ class Facade:
         genomepipe.get_hegs()
         genomepipe.clean_hegs()
         genomepipe.get_bias('temp/temporary.fasta', originalfilename)
-        self.file = os.getcwd() + "/temp/" +  originalfilename + ".bias.csv"
+        self.file = originalfilename + ".bias.csv"
+        print(self.file)
 
     def ncbi(self, accession):
         os.system("rm -rf temp")
@@ -114,7 +115,8 @@ class Facade:
         ncbipipe.get_hegs()
         ncbipipe.clean_hegs()
         ncbipipe.get_bias('temp/temporary.fasta', accession)
-        self.file = os.getcwd() + "/temp/" +  accession + ".bias.csv"
+        self.file = accession + ".bias.csv"
+
 
 
 
