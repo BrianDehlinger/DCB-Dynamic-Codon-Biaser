@@ -5,15 +5,15 @@ A web application for dynamically calculating the codon usage bias in bacterial 
 
 Here is a list of required dependencies
 
-A Linux OS
-Python version 3 with:
-    Biopython https://biopython.org/
-    BeautifulSoup4 https://www.crummy.com/software/BeautifulSoup/bs4/doc/#installing-beautiful-soup
-    Pandas https://pandas.pydata.org/
-    NumPy https://www.numpy.org/
-    flask http://flask.pocoo.org/
+- A Linux OS
+- Python version 3 with:
+    1) Biopython https://biopython.org/
+    2) BeautifulSoup4 https://www.crummy.com/software/BeautifulSoup/bs4/doc/#installing-beautiful-soup
+    3) Pandas https://pandas.pydata.org/
+    4) NumPy https://www.numpy.org/
+    5) flask http://flask.pocoo.org/
 
-Prodigal: https://github.com/hyattpd/Prodigal/wiki/installation
+- Prodigal: https://github.com/hyattpd/Prodigal/wiki/installation
 
 # Setup and Installation
 
