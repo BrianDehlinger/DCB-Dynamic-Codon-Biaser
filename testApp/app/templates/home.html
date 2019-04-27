@@ -1,21 +1,16 @@
 <html>
 	<head> 
-		<title>Dynamic Codon Bias</title>
+		<title>Dynamic Codon Biaser</title>
 	</head>
 	<body>
-		{% with messages = get_flashed_messages() %}
-			{% if messages %}
-				{% for message in messages %}
-					{{ message }}
-				{% endfor %}	
-			{% endif %}
-		{% endwith %}
+		<h1> Dynamic Codon Biaser </h1>
 		<form action = "http://localhost:5000/index" method = "post">
 			<p><input type = "submit" name="ncbi" value = "NCBI" /></p>
 		</form>
 		<form action = "http://localhost:5000/index" method = "post">
 			<p><input type = "submit" name="upload" value = "UPLOAD" /></p>
 		</form>
+		<p>Select an option from above</p>
 	</body>
 </html>
 

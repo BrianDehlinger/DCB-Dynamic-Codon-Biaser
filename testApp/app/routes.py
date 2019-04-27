@@ -73,7 +73,7 @@ def uploader():
 				os.chdir("..")
 				return send_file(app.config['UPLOAD_FOLDER'] + "/temp/" + file.filename +  ".zip", as_attachment=True)
 			except:
-				flash("There was an error! Please make sure file is in nucleotide fasta format and is a complete genome. Then try reuploading genome, server may be busy.")
+				flash("There was an error! Please make sure file is in nucleotide fasta format and is a complete genome. Then try reuploading the genome, server may be busy.")
 				return redirect('/upload')
 
 
