@@ -15,7 +15,7 @@ def allowed_file(filename):
 
 ## Defines the route that the flask app will go when the user does not specify anything after the first slash. This page has two request forms. A user can navigate to either the NCBI or USER UPLOAD PAGE
 ## The home HTML template in the templates folder is rendered here.
-@app.route('/',methods= ['POST', 'GET'])
+@app.route('/index',methods= ['POST', 'GET'])
 def index():
 	if request.method == 'POST':
 		if "ncbi" in request.form:
