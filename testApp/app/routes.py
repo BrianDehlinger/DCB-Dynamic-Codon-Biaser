@@ -41,6 +41,7 @@ def my_form_post():
 			facade.ncbi(text)
 			os.chdir(app.config['UPLOAD_FOLDER'] + "/temp")
 			os.system("zip " + str(text) + ".zip " + facade.file + " temporary.fasta")
+			os.chdir("..")
 			return send_file(app.config['UPLOAD_FOLDER'] + "/temp/" + text +  ".zip", as_attachment=True)
 		except:
 			flash('There was an error, please make sure the RefSeq Accession has an assembly, and is a bacterial genome. Also please try reuploading the genome. The server may be busy.')
@@ -69,6 +70,7 @@ def uploader():
 				facade.uploaded_genome(theSecureName, file.filename)
 				os.chdir(app.config['UPLOAD_FOLDER'] + "/temp")
 				os.system("zip " + str(file.filename) + ".zip " + facade.file + " temporary.fasta")
+				os.chdir("..")
 				return send_file(app.config['UPLOAD_FOLDER'] + "/temp/" + file.filename +  ".zip", as_attachment=True)
 			except:
 				flash("There was an error! Please make sure file is in nucleotide fasta format and is a complete genome. Then try reuploading genome, server may be busy.")

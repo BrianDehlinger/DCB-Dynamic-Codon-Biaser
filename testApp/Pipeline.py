@@ -58,7 +58,8 @@ class GeneralPipeline(abc.ABC):
             if (seq_record.id in items):
                 print(seq_record)
                 newSeqs.append(seq_record)
-
+        if len(newSeqs) <38:
+            print("WARNING there are less than 38 sequences.")
         with open("temp/temporary.fasta", "w") as handle:
             SeqIO.write(newSeqs, handle, "fasta")
         return len(newSeqs)
