@@ -5,27 +5,38 @@ from Bio import Entrez
 from Pipeline import Facade
 from werkzeug.utils import secure_filename
 
+## Set the allowed file extensions here
 ALLOWED = set(['txt', 'fna', 'fasta'])
 
+## Function that determines if a file has a specified file extension. 
 def allowed_file(filename):
 	return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED
 
 
-@app.route('/index',methods= ['POST', 'GET'])
+## Defines the route that the flask app will go when the user does not specify anything after the first slash. This page has two request forms. A user can navigate to either the NCBI or USER UPLOAD PAGE
+## The home HTML template in the templates folder is rendered here.
+@app.route('/',methods= ['POST', 'GET'])
 def index():
 	if request.method == 'POST':
 		if "ncbi" in request.form:
 			return redirect(url_for('ncbi'))
 		if "upload" in request.form:
-			print("here")
 			return redirect(url_for('upload'))
 	else:
 		return render_template('home.html')
 
+## Defines the route to the NCBI webpage. The ncbi HTML template in the templates folder will be rendered here.
 @app.route('/ncbi', methods= ['POST', 'GET'])
 def ncbi():
 	return render_template('ncbi.html')
 
+## Defines a method that will be run in the NCBI HTML webpage. 
+## If a user enters an invalid RefSeq Accession number(as determined by Biopythons Entrez module), the web page will be refreshed displaying a message that the RefSeq Accession is invalid. 
+## The application will call the facade's ncbi method if the RefSeq Accession is valid. The method will take the user input as the argument. The system will change the current working directory to the 
+## temporary folder after the pipeline runs. The application will zip up the file into a file named what the user specified. 
+## For example the zip file name will be APNU000.zip if the user entered APNU000 in the input. 
+## This zip will contain the csv file with the bias statistics and the fasta file containing the highly expressed genes. 
+## The file is sent to the user as a download with the send_file function. 
 @app.route('/ncbidata', methods = ['POST'])
 def my_form_post():
 	if request.method == 'POST':
@@ -47,11 +58,14 @@ def my_form_post():
 			flash('There was an error, please make sure the RefSeq Accession has an assembly, and is a bacterial genome. Also please try reuploading the genome. The server may be busy.')
 			return redirect('/ncbi')
 
+##This route specifies that the upload HTML file in templates will be rendered in the /upload route.
 @app.route('/upload', methods=['POST', 'GET'])
 def upload():
 	return render_template('upload.html')
 
-
+## This route specifies the function that will run when the user submits a genome to the web server on the /upload route.
+## Seveal errors are handled. User uploaded files are renamed as a secure filename. The facade is created and the uploaded_genome method is called, with theSecureName and the actualName as two different arguments. 
+## A zip file is created containing the highly expressed genes and the bias calculations. The user is given the zip file with the send_file argument.
 @app.route('/uploader', methods = ['POST'])
 def uploader():
 	if request.method == 'POST':
