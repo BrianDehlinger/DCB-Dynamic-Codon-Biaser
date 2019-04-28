@@ -1,5 +1,5 @@
 from app import app
-from flask import redirect, url_for, request, render_template, flash, request, make_response, request, send_file, after_this_request
+from flask import redirect, url_for, request, render_template, flash, request, make_response, request, send_file
 import os
 from Bio import Entrez
 from Pipeline import Facade
@@ -7,7 +7,7 @@ from werkzeug.utils import secure_filename
 from zipfile import ZipFile
 import io
 import tempfile
-import shutil
+
 
 ## Set the allowed file extensions here
 ALLOWED = set(['txt', 'fna', 'fasta'])
@@ -42,7 +42,7 @@ def ncbi():
 ## For example the zip file name will be APNU000.zip if the user entered APNU000 in the input. 
 ## This zip will contain the csv file with the bias statistics and the fasta file containing the highly expressed genes. 
 ## The file is sent to the user as a download with the send_file function. 
-## The zip file is buffered in memory. The file is served to the user and the temporary folder is deleted!
+## The zip file is buffered in memory. The file is served to the user and the temporary folder is deleted! We utilize only temporary folders throughout this whole process and use context managers to garbage collect after these folders and files are no longer needed to avoid clutter on the server.
 @app.route('/ncbidata', methods = ['POST'])
 def my_form_post():
 	if request.method == 'POST':
@@ -81,7 +81,7 @@ def upload():
 ## This route specifies the function that will run when the user submits a genome to the web server on the /upload route.
 ## Seveal errors are handled. User uploaded files are renamed as a secure filename. The facade is created and the uploaded_genome method is called, with theSecureName and the actualName as two different arguments. 
 ## A zip file is created containing the highly expressed genes and the bias calculations. The user is given the zip file with the send_file argument.
-## The zip file is buffered into memory. This file is served to the user and the temporary folder is deleted.
+## The zip file is buffered into memory. This file is served to the user and the temporary folder is deleted. We utilize only temporary folders throughout this whole process and use context managers to garbage collect after these folders and files are no longer needed to avoid clutter on the server.
 @app.route('/uploader', methods = ['POST'])
 def uploader():
 	if request.method == 'POST':
@@ -113,6 +113,9 @@ def uploader():
 				print(e)
 				flash("There was an error! Please make sure file is in nucleotide fasta format and is a complete genome. Then try reuploading the genome, server may be busy.")
 				return redirect('/upload')
+		else: 
+			flash("Only upload a .fasta, .fna, or .txt file")
+			return redirect('/upload')
 
 
 

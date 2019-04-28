@@ -42,7 +42,7 @@ class GeneralPipeline():
 
     ## Reads in the matches from diamond. This function then cleans up and standarizes the output so that there are at most 40 highly expressed 
     ## Genes in an output file called temporary.fasta. Elongation factor EF-2 is replaced with elongation factor G because they are actually
-    ## the same protein. 
+    ## the same protein. File is outputed as HEGS.fasta.
     def clean_hegs(self, filename):
         df = pandas.read_table("matches", names=["Subject", "Bit", "SeqID"], skipinitialspace=True)
         df = df.replace('\[.*\]', '', regex=True)
@@ -64,7 +64,7 @@ class GeneralPipeline():
         return len(newSeqs)
     ## Uses DIAMOND on the database called testDB that contains a database assembled from the identical protein groups NCBI database of the
     ## 40 highly expressed genes in bacteria. Outputs a file called matches with the sequence title, bitscore, and query sequence id. K is specified to avoid redundancy and get 
-    ## the top hit for each query. 
+    ## the top hit for each query. Diamond has a binary in the parent working directory in this application. Diamond could be installed to avoid this change in directory.
     def get_hegs(self, filename, directory):
         os.chdir("..")
         os.system("./diamond blastx -d testDB -q " + directory + "/" + self.file + " -o " + directory + "/matches -f 6 stitle bitscore qseqid -k 1")
@@ -90,7 +90,7 @@ class GenomePipe(GeneralPipeline):
         self.file = (filename + "CDS")
 
     
-## This class is to simplify access in the actual flask application. It abstracts complexity away. 
+## This class is to simplify access in the actual flask application. It abstracts complexity away. Both of the methods utilize a directory for the get_hegs method(diamond). This could be avoided completely by installing diamond and modifying the code instead of using the binary.
 class Facade:
     
     ## This function is called when a user decides to upload a genome. First any temporary folder is removed. A new temporary folder is made. The 
@@ -106,6 +106,7 @@ class Facade:
         genomepipe.get_bias("HEGS.fasta", originalfilename)
         self.file = originalfilename + ".bias.csv"
 
+    ### This function is called when a user enters a RefSeq accession. Prodigal is first called on the uploaded genome. Then the file name is set with get_data. get_hegs outputs the matches from running a query against a local database. Clean_hegs is called to output only 40 HEGs as there are some duplicates and inconsistencies in the output from diamond. get_bias actually returns the csv containing the bias statistics. The file name for facade is set to the bias csv file. 
     def ncbi(self, accession, directory):
         ncbipipe = NcbiPipe()
         ncbipipe.get_data(accession)
