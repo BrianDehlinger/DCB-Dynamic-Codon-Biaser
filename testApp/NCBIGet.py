@@ -58,7 +58,7 @@ def get_accession_data(accession):
 ## Constructs the download URL and gets the information onto the system
     lastPieceOfUrl = re.findall('[^\/]+$', url)[0]
     downloadUrl = url + "/" + lastPieceOfUrl + "_cds_from_genomic.fna.gz"
-    os.chdir("temp")
+    os.chdir(accession + "temp")
     os.system("wget " + downloadUrl)
     os.system("gunzip -f  *.gz")
     os.chdir("..")
