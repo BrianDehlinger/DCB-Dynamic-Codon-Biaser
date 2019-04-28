@@ -15,13 +15,14 @@ def allowed_file(filename):
 
 ## Defines the route that the flask app will go when the user does not specify anything after the first slash. This page has two request forms. A user can navigate to either the NCBI or USER UPLOAD PAGE
 ## The home HTML template in the templates folder is rendered here.
-@app.route('/index',methods= ['POST', 'GET'])
+@app.route('/',methods= ['POST', 'GET'])
+@app.route('/index', methods = ['POST', 'GET'])
 def index():
 	if request.method == 'POST':
 		if "ncbi" in request.form:
-			return redirect(url_for('ncbi'))
+			return redirect(url_for('ncbi', external=True))
 		if "upload" in request.form:
-			return redirect(url_for('upload'))
+			return redirect(url_for('upload', external=True))
 	else:
 		return render_template('home.html')
 
@@ -51,7 +52,7 @@ def my_form_post():
 		try:
 			facade.ncbi(text)
 			os.chdir(app.config['UPLOAD_FOLDER'] + "/temp")
-			os.system("zip " + str(text) + ".zip " + facade.file + " temporary.fasta")
+			os.system("zip " + str(text) + ".zip " + facade.file + " HEGS.fasta")
 			os.chdir("..")
 			return send_file(app.config['UPLOAD_FOLDER'] + "/temp/" + text +  ".zip", as_attachment=True)
 		except:
@@ -83,7 +84,7 @@ def uploader():
 				facade = Facade()
 				facade.uploaded_genome(theSecureName, file.filename)
 				os.chdir(app.config['UPLOAD_FOLDER'] + "/temp")
-				os.system("zip " + str(file.filename) + ".zip " + facade.file + " temporary.fasta")
+				os.system("zip " + str(file.filename) + ".zip " + facade.file + " HEGS.fasta")
 				os.chdir("..")
 				return send_file(app.config['UPLOAD_FOLDER'] + "/temp/" + file.filename +  ".zip", as_attachment=True)
 			except:

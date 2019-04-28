@@ -1,4 +1,3 @@
-import abc
 from Bias import *
 from Bio import SeqIO
 import pandas
@@ -7,7 +6,7 @@ import os
 import csv
 from timeit import default_timer as timer
 
-class GeneralPipeline(abc.ABC):
+class GeneralPipeline():
     def __init__(self):
         self.file = ''
 
@@ -60,7 +59,7 @@ class GeneralPipeline(abc.ABC):
                 newSeqs.append(seq_record)
         if len(newSeqs) <38:
             print("WARNING there are less than 38 sequences.")
-        with open("temp/temporary.fasta", "w") as handle:
+        with open("temp/HEGS.fasta", "w") as handle:
             SeqIO.write(newSeqs, handle, "fasta")
         return len(newSeqs)
     ## Uses DIAMOND on the database called testDB that contains a database assembled from the identical protein groups NCBI database of the
@@ -104,7 +103,7 @@ class Facade:
         genomepipe.get_data(filename)
         genomepipe.get_hegs()
         genomepipe.clean_hegs()
-        genomepipe.get_bias('temp/temporary.fasta', originalfilename)
+        genomepipe.get_bias('temp/HEGS.fasta', originalfilename)
         self.file = originalfilename + ".bias.csv"
         print(self.file)
 
@@ -115,7 +114,7 @@ class Facade:
         ncbipipe.get_data(accession)
         ncbipipe.get_hegs()
         ncbipipe.clean_hegs()
-        ncbipipe.get_bias('temp/temporary.fasta', accession)
+        ncbipipe.get_bias('temp/HEGS.fasta', accession)
         self.file = accession + ".bias.csv"
 
 
