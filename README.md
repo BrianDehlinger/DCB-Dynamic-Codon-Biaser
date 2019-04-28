@@ -16,6 +16,7 @@ Here is a list of required dependencies
 
 - Prodigal: https://github.com/hyattpd/Prodigal/wiki/installation
 
+
 # Setup and Installation
 
 *Ensure all dependencies are installed before these steps*
@@ -31,7 +32,14 @@ Here is a list of required dependencies
 1) Go to a terminal and change  your view to the testApp subfolder
 2) Enter the command:
     $ python3 -m flask run
-3) Web server will be up.
+3) Local web server will be up. This is NOT concurrent and it is highly discouraged to use the flask run command in production.
+
+You may choose any number of methods for deployment!
+
+Gunicorn is our choice.
+
+
+
     
     
   
