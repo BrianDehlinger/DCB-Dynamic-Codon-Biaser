@@ -6,6 +6,8 @@ from Pipeline import Facade
 from werkzeug.utils import secure_filename
 from zipfile import ZipFile
 import io
+import tempfile
+import shutil
 
 ## Set the allowed file extensions here
 ALLOWED = set(['txt', 'fna', 'fasta'])
@@ -40,6 +42,7 @@ def ncbi():
 ## For example the zip file name will be APNU000.zip if the user entered APNU000 in the input. 
 ## This zip will contain the csv file with the bias statistics and the fasta file containing the highly expressed genes. 
 ## The file is sent to the user as a download with the send_file function. 
+## The zip file is buffered in memory. The file is served to the user and the temporary folder is deleted!
 @app.route('/ncbidata', methods = ['POST'])
 def my_form_post():
 	if request.method == 'POST':
@@ -53,20 +56,19 @@ def my_form_post():
 			return redirect('/ncbi')
 			
 		try:
-			facade.ncbi(text)
-			os.chdir(app.config['UPLOAD_FOLDER'] + "/" + text + "temp/")
-			data = io.BytesIO()
-			with ZipFile(data, mode='w') as z:
-				z.write(facade.file)
-				z.write("HEGS.fasta")
-			data.seek(0)
-
-			os.chdir("..")
-			os.system("rm -rf " + text + "temp")
-			return send_file(data, attachment_filename= text + ".zip", as_attachment=True)
+			os.chdir(app.config['UPLOAD_FOLDER'])
+			with tempfile.TemporaryDirectory(dir=os.getcwd()) as tempdir:
+				temp = tempdir.rsplit('/', 1)[-1]
+				os.chdir(tempdir)
+				facade.ncbi(text, temp)
+				data = io.BytesIO()
+				with ZipFile(data, mode='w') as z:
+					z.write(facade.file)
+					z.write("HEGS.fasta")
+					os.chdir("..")
+				data.seek(0)
+				return send_file(data, attachment_filename= text + ".zip", as_attachment=True)
 		except Exception as e:
-			print(e)
-			os.system("rm -rf " + text + "temp")
 			flash('There was an error, please make sure the RefSeq Accession has an assembly, and is a bacterial genome. Also please try reuploading the genome. The server may be busy.')
 			return redirect('/ncbi')
 	
@@ -79,6 +81,7 @@ def upload():
 ## This route specifies the function that will run when the user submits a genome to the web server on the /upload route.
 ## Seveal errors are handled. User uploaded files are renamed as a secure filename. The facade is created and the uploaded_genome method is called, with theSecureName and the actualName as two different arguments. 
 ## A zip file is created containing the highly expressed genes and the bias calculations. The user is given the zip file with the send_file argument.
+## The zip file is buffered into memory. This file is served to the user and the temporary folder is deleted.
 @app.route('/uploader', methods = ['POST'])
 def uploader():
 	if request.method == 'POST':
@@ -91,22 +94,23 @@ def uploader():
 			return redirect('/upload')
 		if file and allowed_file(file.filename):
 			try:
-				theSecureName = secure_filename(file.filename)
-				file.save(os.path.join(app.config['UPLOAD_FOLDER'], theSecureName))
+				theSecureName = secure_filename(file.filename)			
 				facade = Facade()
-				facade.uploaded_genome(theSecureName, file.filename)
-				os.chdir(app.config['UPLOAD_FOLDER'] + "/" + file.filename + "temp/")
-				data = io.BytesIO()
-				with ZipFile(data, mode='w') as z:
-					z.write(facade.file)
-					z.write("HEGS.fasta")
-				data.seek(0)
-				os.chdir("..")
-				os.system("rm -rf " + file.filename + "temp")
-				return send_file(data, attachment_filename= file.filename + ".zip", as_attachment=True)
+				os.chdir(app.config['UPLOAD_FOLDER'])
+				with tempfile.TemporaryDirectory(dir=os.getcwd()) as tempdir:
+					temp = tempdir.rsplit('/', 1)[-1]
+					file.save(os.path.join(app.config['UPLOAD_FOLDER'] + '/' + temp, theSecureName))
+					os.chdir(tempdir)
+					facade.uploaded_genome(theSecureName, file.filename, temp)
+					data = io.BytesIO()
+					with ZipFile(data, mode='w') as z:
+						z.write(facade.file)
+						z.write("HEGS.fasta")
+						os.chdir("..")
+					data.seek(0)
+					return send_file(data, attachment_filename= file.filename + ".zip", as_attachment=True)
 			except Exception as e:
 				print(e)
-				os.system("rm -rf " + file.filename + "temp")
 				flash("There was an error! Please make sure file is in nucleotide fasta format and is a complete genome. Then try reuploading the genome, server may be busy.")
 				return redirect('/upload')
 
