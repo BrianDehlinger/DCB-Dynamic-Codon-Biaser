@@ -1,9 +1,11 @@
 from app import app
-from flask import redirect, url_for, request, render_template, flash, request, make_response, request, send_file
+from flask import redirect, url_for, request, render_template, flash, request, make_response, request, send_file, after_this_request
 import os
 from Bio import Entrez
 from Pipeline import Facade
 from werkzeug.utils import secure_filename
+from zipfile import ZipFile
+import io
 
 ## Set the allowed file extensions here
 ALLOWED = set(['txt', 'fna', 'fasta'])
@@ -49,15 +51,25 @@ def my_form_post():
 		except:
 			flash('The RefSeq Accession number is invalid')
 			return redirect('/ncbi')
+			
 		try:
 			facade.ncbi(text)
 			os.chdir(app.config['UPLOAD_FOLDER'] + "/" + text + "temp/")
-			os.system("zip " + str(text) + ".zip " + facade.file + " HEGS.fasta")
+			data = io.BytesIO()
+			with ZipFile(data, mode='w') as z:
+				z.write(facade.file)
+				z.write("HEGS.fasta")
+			data.seek(0)
+
 			os.chdir("..")
-			return send_file(app.config['UPLOAD_FOLDER'] + "/" + text + "temp/" + text +  ".zip", as_attachment=True)
-		except:
+			os.system("rm -rf " + text + "temp")
+			return send_file(data, attachment_filename= text + ".zip", as_attachment=True)
+		except Exception as e:
+			print(e)
+			os.system("rm -rf " + text + "temp")
 			flash('There was an error, please make sure the RefSeq Accession has an assembly, and is a bacterial genome. Also please try reuploading the genome. The server may be busy.')
 			return redirect('/ncbi')
+	
 
 ##This route specifies that the upload HTML file in templates will be rendered in the /upload route.
 @app.route('/upload', methods=['POST', 'GET'])
@@ -84,11 +96,17 @@ def uploader():
 				facade = Facade()
 				facade.uploaded_genome(theSecureName, file.filename)
 				os.chdir(app.config['UPLOAD_FOLDER'] + "/" + file.filename + "temp/")
-				os.system("zip " + str(file.filename) + ".zip " + facade.file + " HEGS.fasta")
+				data = io.BytesIO()
+				with ZipFile(data, mode='w') as z:
+					z.write(facade.file)
+					z.write("HEGS.fasta")
+				data.seek(0)
 				os.chdir("..")
-				return send_file(app.config['UPLOAD_FOLDER'] + "/" + file.filename + "temp/" + file.filename +  ".zip", as_attachment=True)
+				os.system("rm -rf " + file.filename + "temp")
+				return send_file(data, attachment_filename= file.filename + ".zip", as_attachment=True)
 			except Exception as e:
 				print(e)
+				os.system("rm -rf " + file.filename + "temp")
 				flash("There was an error! Please make sure file is in nucleotide fasta format and is a complete genome. Then try reuploading the genome, server may be busy.")
 				return redirect('/upload')
 
