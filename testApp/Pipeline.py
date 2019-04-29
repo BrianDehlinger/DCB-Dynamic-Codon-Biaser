@@ -4,7 +4,7 @@ import pandas
 from NCBIGet import get_accession_data
 import os
 import csv
-from pathlib import Path
+
 
 class GeneralPipeline():
     def __init__(self):

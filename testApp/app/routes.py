@@ -69,6 +69,7 @@ def my_form_post():
 				data.seek(0)
 				return send_file(data, attachment_filename= text + ".zip", as_attachment=True)
 		except Exception as e:
+			print(e)
 			flash('There was an error, please make sure the RefSeq Accession has an assembly, and is a bacterial genome. Also please try reuploading the genome. The server may be busy.')
 			return redirect('/ncbi')
 	
