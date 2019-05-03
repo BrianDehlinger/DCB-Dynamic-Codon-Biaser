@@ -1,7 +1,7 @@
 from Bias import *
 from Bio import SeqIO
 import pandas
-from NCBIGet import get_accession_data
+from NCBIGet import get_accession_data, get_assembly_data
 import os
 import csv
 
@@ -73,10 +73,18 @@ class GeneralPipeline():
 
 class NcbiPipe(GeneralPipeline):
     
-    ## This function downloads the genome from a refseq accession number. It delegates work to the get_accession_data method from the NCBIGet module.
+    ## This function downloads the genome from a refseq nucleotide accession number. It delegates work to the get_accession_data method from the NCBIGet module.
     ## Self.file is the file name of the downloaded fasta file. 
     def get_data(self, accession):
         self.file = get_accession_data(accession)
+        
+
+class NcbiAssemblyPipe(GeneralPipeline):
+    
+    ## This function downloads the genome from a refseq assembly accession number. It delegates work to the get_assembly_data method from the NCBIGet module.
+    ## Self.file is the file name of the downloaded fasta file. 
+    def get_data(self, accession):
+        self.file = get_assembly_data(accession)
         
 
 class GenomePipe(GeneralPipeline):
@@ -109,6 +117,15 @@ class Facade:
     ### This function is called when a user enters a RefSeq accession. Prodigal is first called on the uploaded genome. Then the file name is set with get_data. get_hegs outputs the matches from running a query against a local database. Clean_hegs is called to output only 40 HEGs as there are some duplicates and inconsistencies in the output from diamond. get_bias actually returns the csv containing the bias statistics. The file name for facade is set to the bias csv file. 
     def ncbi(self, accession, directory):
         ncbipipe = NcbiPipe()
+        ncbipipe.get_data(accession)
+        ncbipipe.get_hegs(accession, directory)
+        ncbipipe.clean_hegs(accession)
+        ncbipipe.get_bias("HEGS.fasta", accession)
+        self.file = accession + ".bias.csv"
+
+  ### This function is called when a user enters a RefSeq Assembly accession. Prodigal is first called on the uploaded genome. Then the file name is set with get_data. get_hegs outputs the matches from running a query against a local database. Clean_hegs is called to output only 40 HEGs as there are some duplicates and inconsistencies in the output from diamond. get_bias actually returns the csv containing the bias statistics. The file name for facade is set to the bias csv file. 
+    def ncbiassembly(self, accession, directory):
+        ncbipipe = NcbiAssemblyPipe()
         ncbipipe.get_data(accession)
         ncbipipe.get_hegs(accession, directory)
         ncbipipe.clean_hegs(accession)

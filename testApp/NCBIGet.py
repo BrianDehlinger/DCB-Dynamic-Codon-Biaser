@@ -7,7 +7,6 @@ import os
 def get_accession_data(accession):
     the_request = requests.get("https://www.ncbi.nlm.nih.gov/nuccore/" + accession)
     soup = bs4.BeautifulSoup(the_request.text)
-    marker = False
 
 ## Base URL Of NCBI common to all URLS
     temporaryURL = 'https://www.ncbi.nlm.nih.gov'
@@ -27,13 +26,11 @@ def get_accession_data(accession):
             for a in soup.find_all('a', href=True):
                 if('/assembly' in a['href']):
                     theURL = a['href']
-                    marker = True
                     break
         return theURL
 
 ## Gets the URL for the Assembly link from NCBI's refseq accession
     temporaryURL2 = find_url('/assembly', soup)
-    print(temporaryURL2)
     new_request = requests.get(temporaryURL2)
     new_soup = bs4.BeautifulSoup(new_request.text)
 
@@ -56,6 +53,22 @@ def get_accession_data(accession):
             break
 
 ## Constructs the download URL and gets the information onto the system
+    lastPieceOfUrl = re.findall('[^\/]+$', url)[0]
+    downloadUrl = url + "/" + lastPieceOfUrl + "_cds_from_genomic.fna.gz"
+    os.system("wget " + downloadUrl)
+    os.system("gunzip -f  *.gz")
+    return lastPieceOfUrl + "_cds_from_genomic.fna"
+
+def get_assembly_data(accession):
+    the_request = requests.get("https://www.ncbi.nlm.nih.gov/assembly/" + accession)
+    soup = bs4.BeautifulSoup(the_request.text)
+    url = ''
+    items = soup.find_all('a', href=True)
+    for a in items:
+        if "ftp://" in a['href']:
+            url = a['href']
+            break
+
     lastPieceOfUrl = re.findall('[^\/]+$', url)[0]
     downloadUrl = url + "/" + lastPieceOfUrl + "_cds_from_genomic.fna.gz"
     os.system("wget " + downloadUrl)

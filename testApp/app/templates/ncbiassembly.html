@@ -1,6 +1,6 @@
 <html>
 	<body>
-		<h1> Enter a RefSeq Nucleotide Accession Number for a prokaryotic genome! </h1>
+		<h1> Enter a RefSeq Assembly Accession Number for a prokaryotic genome! </h1>
 		{% with messages = get_flashed_messages() %}
 				{% if messages %}
 					{% for message in messages %}
@@ -8,7 +8,7 @@
 					{% endfor %}	
 				{% endif %}
 		{% endwith %}
-		<form action = "/ncbidata" method="POST" onsubmit="myFunction()" enctype = "multipart/form-data">
+		<form action = "/ncbiassemblydata" method="POST" onsubmit="myFunction()" enctype = "multipart/form-data">
 			<input name="text">
 			<input type="submit">
 		</form>
@@ -19,4 +19,3 @@
 		</script>
 	</body>
 </html>
-

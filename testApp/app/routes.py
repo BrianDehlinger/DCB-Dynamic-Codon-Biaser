@@ -7,6 +7,7 @@ from werkzeug.utils import secure_filename
 from zipfile import ZipFile
 import io
 import tempfile
+import requests
 
 
 ## Set the allowed file extensions here
@@ -27,6 +28,8 @@ def index():
 			return redirect(url_for('ncbi', external=True))
 		if "upload" in request.form:
 			return redirect(url_for('upload', external=True))
+		if "ncbiassembly" in request.form:
+			return redirect(url_for('ncbiassembly', external=True))
 	else:
 		return render_template('home.html')
 
@@ -118,6 +121,43 @@ def uploader():
 			flash("Only upload a .fasta, .fna, or .txt file")
 			return redirect('/upload')
 
+
+@app.route('/ncbiassembly', methods= ['POST', 'GET'])
+def ncbiassembly():
+	return render_template('ncbiassembly.html')
+
+
+@app.route('/ncbiassemblydata', methods = ['POST'])
+def assembly_post():
+	if request.method == 'POST':
+		text = request.form['text']
+		facade = Facade()
+		try:
+			the_request = requests.get("https://ncbi.nlm.nih.gov/assembly/" + text)
+			if the_request.status_code == 404:
+			    raise ValueError("The RefSeq Assemmbly Accession number is invalid")
+		except ValueError as e:
+			print(e)
+			flash('The RefSeq Assembly Accession number is invalid')
+			return redirect('/ncbiassembly')
+			
+		try:
+			os.chdir(app.config['UPLOAD_FOLDER'])
+			with tempfile.TemporaryDirectory(dir=os.getcwd()) as tempdir:
+				temp = tempdir.rsplit('/', 1)[-1]
+				os.chdir(tempdir)
+				facade.ncbiassembly(text, temp)
+				data = io.BytesIO()
+				with ZipFile(data, mode='w') as z:
+					z.write(facade.file)
+					z.write("HEGS.fasta")
+					os.chdir("..")
+				data.seek(0)
+				return send_file(data, attachment_filename= text + ".zip", as_attachment=True)
+		except Exception as e:
+			print(e)
+			flash('There was an error, please make sure the RefSeq Accession has an assembly, and is a bacterial genome. Also please try reuploading the genome. The server may be busy.')
+			return redirect('/ncbiassembly')
 
 
 
