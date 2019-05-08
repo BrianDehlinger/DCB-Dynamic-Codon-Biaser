@@ -13,6 +13,7 @@ Here is a list of required dependencies
     4) NumPy https://www.numpy.org/
     5) flask http://flask.pocoo.org/
     6) requests module installable via pip3 install requests
+    6) flask-bootstrap installable via pip3 install flask-bootstrap
 
 - Prodigal: https://github.com/hyattpd/Prodigal/wiki/installation
 
