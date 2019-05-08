@@ -106,14 +106,14 @@ class Facade:
     ## temporaryFile that was uploaded is moved to this temporary folder. A Genome Pipeline is created. Prodigal is run on the data. The file name is set with get_data. 
     ## Diamond is run with get_hegs. Clean_hegs standardizes the output. Get_bias returns a csv file into the temporary directoy. Self.file is changed in order to allow flask to actually
     ## return the csv. 
-    def uploaded_genome(self, filename, originalfilename, directory):
+    def uploaded_genome(self, filename, directory):
         genomepipe = GenomePipe()
         genomepipe.prodigal_it(filename)
         genomepipe.get_data(filename)
         genomepipe.get_hegs(filename, directory)
         genomepipe.clean_hegs(filename)
-        genomepipe.get_bias("HEGS.fasta", originalfilename)
-        self.file = originalfilename + ".bias.csv"
+        genomepipe.get_bias("HEGS.fasta", filename)
+        self.file = filename + ".bias.csv"
 
     ### This function is called when a user enters a RefSeq accession. Prodigal is first called on the uploaded genome. Then the file name is set with get_data. get_hegs outputs the matches from running a query against a local database. Clean_hegs is called to output only 40 HEGs as there are some duplicates and inconsistencies in the output from diamond. get_bias actually returns the csv containing the bias statistics. The file name for facade is set to the bias csv file. 
     def ncbi(self, accession, directory):

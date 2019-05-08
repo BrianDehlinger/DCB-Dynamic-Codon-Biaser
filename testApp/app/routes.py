@@ -98,21 +98,23 @@ def uploader():
 			return redirect('/upload')
 		if file and allowed_file(file.filename):
 			try:
-				theSecureName = secure_filename(file.filename)			
+				theSecureName = secure_filename(file.filename)
+				if (theSecureName == ''):
+					theSecureName = "YourGenome"	
 				facade = Facade()
 				os.chdir(app.config['UPLOAD_FOLDER'])
 				with tempfile.TemporaryDirectory(dir=os.getcwd()) as tempdir:
 					temp = tempdir.rsplit('/', 1)[-1]
 					file.save(os.path.join(app.config['UPLOAD_FOLDER'] + '/' + temp, theSecureName))
 					os.chdir(tempdir)
-					facade.uploaded_genome(theSecureName, file.filename, temp)
+					facade.uploaded_genome(theSecureName, temp)
 					data = io.BytesIO()
 					with ZipFile(data, mode='w') as z:
 						z.write(facade.file)
 						z.write("HEGS.fasta")
 						os.chdir("..")
 					data.seek(0)
-					return send_file(data, attachment_filename= file.filename + ".zip", as_attachment=True)
+					return send_file(data, attachment_filename= theSecureName + ".zip", as_attachment=True)
 			except Exception as e:
 				print(e)
 				flash("There was an error! Please make sure file is in nucleotide fasta format and is a complete genome. Then try reuploading the genome, server may be busy.")
