@@ -1,0 +1,23 @@
+<html>
+    <head>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+      {% if title %}
+      <title>{{ title }} Dynamic Codon Biaser</title>
+      {% else %}
+      <title> Dynamic Codon Biaser </title>
+      {% endif %}
+	<style>
+	body {
+		background-image: url(https://cdn.pixabay.com/photo/2018/09/06/18/49/bacteria-3658992_1280.jpg);
+		background-size: cover;
+		background-repeat: no-repeat;
+		color: white;
+		height: 100%;
+	}
+	</style>
+    </head>
+    <body>
+        <hr>
+        {% block content %}{% endblock %}
+    </body>
+</html>

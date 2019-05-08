@@ -1,5 +1,10 @@
+<!DOCTYPE html>
+{% extends "base.html" %}
 <html>
-	<body>
+	<head> 
+		<title>Dynamic Codon Biaser</title>
+	</head>
+	{% block content %}	
 		<h1> Enter a RefSeq Nucleotide Accession Number for a prokaryotic genome! </h1>
 		{% with messages = get_flashed_messages() %}
 				{% if messages %}
@@ -17,6 +22,7 @@
 				alert("Uploaded. Click Okay to Continue!");
 			}
 		</script>
-	</body>
+	{% endblock %}
+	
 </html>
 

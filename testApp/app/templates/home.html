@@ -1,19 +1,26 @@
+<!DOCTYPE html>
+{% extends "base.html" %}
 <html>
 	<head> 
 		<title>Dynamic Codon Biaser</title>
 	</head>
-	<body>
+	{% block content %}
+	<div class = "header">
 		<h1> Dynamic Codon Biaser </h1>
+		<p> From Loyola University Chicago's Bioinformatics Department </p>
+	</div>
+	<div class = "content">
 		<form action = "/index" method = "post">
-			<p><input type = "submit" name="ncbi" value = "NCBI" /></p>
+			<p><input type = "submit" name="ncbi" value = "Query a NCBI Genome RefSeq Accession" /></p>
 		</form>
 		<form action = "/index" method = "post">
-			<p><input type = "submit" name="ncbiassembly" value = "NCBIAssembly" /></p>
+			<p><input type = "submit" name="ncbiassembly" value = "Query a NCBI Assembly Accession" /></p>
 		</form>
 		<form action = "/index" method = "post">
-			<p><input type = "submit" name="upload" value = "UPLOAD" /></p>
+			<p><input type = "submit" name="upload" value = "Upload a Prokaryotic Genome" /></p>
 		</form>
 		<p>Select an option from above</p>
-	</body>
+	</div>
+	{% endblock %}
 </html>
 

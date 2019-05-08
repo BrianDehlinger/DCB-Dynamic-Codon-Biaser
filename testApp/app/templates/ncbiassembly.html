@@ -1,5 +1,7 @@
+<!DOCTYPE html>
+{% extends "base.html" %}
 <html>
-	<body>
+	{% block content %}
 		<h1> Enter a RefSeq Assembly Accession Number for a prokaryotic genome! </h1>
 		{% with messages = get_flashed_messages() %}
 				{% if messages %}
@@ -17,5 +19,5 @@
 				alert("Uploaded. Click Okay to Continue!");
 			}
 		</script>
-	</body>
+	{% endblock %}
 </html>
