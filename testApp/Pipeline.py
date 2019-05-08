@@ -4,6 +4,7 @@ import pandas
 from NCBIGet import get_accession_data, get_assembly_data
 import os
 import csv
+import subprocess
 
 
 class GeneralPipeline():
@@ -67,7 +68,7 @@ class GeneralPipeline():
     ## the top hit for each query. Diamond has a binary in the parent working directory in this application. Diamond could be installed to avoid this change in directory.
     def get_hegs(self, filename, directory):
         os.chdir("..")
-        os.system("./diamond blastx -d testDB -q " + directory + "/" + self.file + " -o " + directory + "/matches -f 6 stitle bitscore qseqid -k 1")
+        subprocess.call(["./diamond", "blastx", "-d", "testDB", "-q", directory + "/" + self.file, "-o", directory + "/matches", "-f", "6", "stitle", "bitscore", "qseqid", "-k", "1"])
         os.chdir(directory)
 
 
@@ -91,7 +92,7 @@ class GenomePipe(GeneralPipeline):
     
     ## Prodigal is run on the temporaryFile(which is what the uploaded genome is called). the -d flag specifies to output a file containing all of the found protein coding sequences found. 
     def prodigal_it(self, filename):
-        os.system("prodigal -i " + filename + " -o " + "tempGenes -f gff -d " + filename + "CDS")
+        subprocess.call(["prodigal", "-i", filename, "-o", "tempGenes", "-f", "gff", "-d", filename + "CDS"])
         
    ## The list of protein coding sequences is called theCDS in this case. Diamond will use this as a query sequence. 
     def get_data(self, filename):

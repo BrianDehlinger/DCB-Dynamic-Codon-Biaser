@@ -2,6 +2,7 @@ import requests
 import bs4
 import re
 import os
+import subprocess
 
 ## Gets the HTML file for the NCBI accession number of interest.
 def get_accession_data(accession):
@@ -71,8 +72,8 @@ def get_assembly_data(accession):
 
     lastPieceOfUrl = re.findall('[^\/]+$', url)[0]
     downloadUrl = url + "/" + lastPieceOfUrl + "_cds_from_genomic.fna.gz"
-    os.system("wget " + downloadUrl)
-    os.system("gunzip -f  *.gz")
+    subprocess.call(["wget", downloadUrl])
+    subprocess.call(["gunzip", "-f", "*.gz"])
     return lastPieceOfUrl + "_cds_from_genomic.fna"
 
 
