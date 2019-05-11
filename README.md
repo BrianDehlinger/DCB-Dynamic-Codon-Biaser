@@ -1,6 +1,42 @@
 # DCB-Dynamic-Codon-Bias
 A web application for dynamically calculating the codon usage bias in bacterial genomes.
 
+**This web application will utilize a database to store the results of the entirety of all bacteria that have complete RefSeq Assemblies on NCBI as of 5/11/2019**
+
+Design:
+
+
+SQL Query language will be utilized to access a local database such as PostgreSQL
+OR
+Kibana and Elastic Search a will be utilzied to enable ultrafast search and visualization.
+
+Data will be stored on a local server running Linux and queries will be possible through a web application.
+Ideally visualization will be done live.
+
+Requirements:
+
+-Website should be concurrent, so code must be written to prevent concurrency issues.
+-Website should allow for reasonable extension of functions. For example different kinds of queries to the coding sequences might be added later and highly expressed genes should be stored for every genome- This will be a fraction of the data from NCBI(16.3GB compressed).
+-Website should provide reasonable information on errors during annotation process.
+-Queries should return results immediately(should not take longer than a few seconds to query the entire database.(So if SQL doesn't work can we ADD elasticsearch?)
+-Data integrity needs to be ensured with checksum from NCBI. 
+
+First all files must be downloaded(DONE)
+Second: a database must be created that can be populated with data from the program. The database should have a primary key being the assembly accession. Other info will be the organism, taxonomic information, codon usage statistics, and file containing 40 highly expressed genes. 
+Third: Data must be indexed properly to ensure fast retrieval, aggregation and queries. (Elastic Search)
+3.5 Database queries connected to web application.
+    Robustness, Security, Integrity of database. 
+Foruth: Visualization and summary statistic layer can be added on top into web application after local testing. Flask or Django?
+Fifth: Deployment options
+
+
+
+
+
+
+
+
+
 # Dependenices:
 
 Here is a list of required dependencies
