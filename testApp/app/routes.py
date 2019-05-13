@@ -52,13 +52,6 @@ def my_form_post():
 		text = request.form['text']
 		facade = Facade()
 		try:
-			Entrez.email = "bdehlinger@luc.edu"	
-			handle = Entrez.efetch(db="nucleotide", id=text)
-		except:
-			flash('The RefSeq Accession number is invalid')
-			return redirect('/ncbi')
-			
-		try:
 			os.chdir(app.config['UPLOAD_FOLDER'])
 			with tempfile.TemporaryDirectory(dir=os.getcwd()) as tempdir:
 				temp = tempdir.rsplit('/', 1)[-1]
