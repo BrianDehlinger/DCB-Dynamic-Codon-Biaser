@@ -14,21 +14,27 @@ def get_accession_data(accession):
 
 ## Function that finds first href that contain part of the urlPiece in the url. 
     def find_url(urlPiece, soup):
-        theURL = ''
-        for a in soup.find_all('a', href=True):
-            if('/assembly' in a['href']):
-                theURL = temporaryURL + a['href']
-                break
-        if theURL:
-            return theURL
-        else:
-            new_request = requests.get("https://www.ncbi.nlm.nih.gov/sviewer/viewer.fcgi?id="+accession+"&db=nuccore&extrafeat=0&fmt_mask=0&retmod=html&withmarkup=on&tool=portal&log")
-            soup = bs4.BeautifulSoup(new_request.text)
+        try:
+            theURL = ''
             for a in soup.find_all('a', href=True):
                 if('/assembly' in a['href']):
-                    theURL = a['href']
+                    theURL = temporaryURL + a['href']
                     break
-        return theURL
+            if theURL:
+                return theURL
+            else:
+                new_request = requests.get("https://www.ncbi.nlm.nih.gov/sviewer/viewer.fcgi?id="+accession+"&db=nuccore&extrafeat=0&fmt_mask=0&retmod=html&withmarkup=on&tool=portal&log")
+                soup = bs4.BeautifulSoup(new_request.text)
+                for a in soup.find_all('a', href=True):
+                    if('/assembly' in a['href']):
+                        theURL = a['href']
+                        break
+        if theURL:
+            return theURL
+        else: 
+            raise ValueError
+        except ValueError as e:
+            print("RefSeq Accession is invalid")
 
 ## Gets the URL for the Assembly link from NCBI's refseq accession
     temporaryURL2 = find_url('/assembly', soup)
