@@ -1,7 +1,7 @@
 # DCB-Dynamic-Codon-Bias Database
 A web application for dynamically calculating the codon usage bias in bacterial genomes.
 
-**This web application will utilize a database to store the results of the entirety of all bacteria that have complete RefSeq Assemblies on NCBI as of 5/11/2019**
+**This web application will utilize a database to store the codon usage bias results of the entirety of all bacteria that have RefSeq Assemblies on NCBI as of 5/11/2019** (Around 150,000 genomes)
 
 Design:
 
