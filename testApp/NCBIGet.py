@@ -29,10 +29,10 @@ def get_accession_data(accession):
                     if('/assembly' in a['href']):
                         theURL = a['href']
                         break
-        if theURL:
-            return theURL
-        else: 
-            raise ValueError
+                if theURL:
+                    return theURL
+                else: 
+                    raise ValueError
         except ValueError as e:
             print("RefSeq Accession is invalid")
 
