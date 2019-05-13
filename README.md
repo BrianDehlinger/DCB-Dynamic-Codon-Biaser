@@ -1,4 +1,4 @@
-# DCB-Dynamic-Codon-Bias
+# DCB-Dynamic-Codon-Bias Database
 A web application for dynamically calculating the codon usage bias in bacterial genomes.
 
 **This web application will utilize a database to store the results of the entirety of all bacteria that have complete RefSeq Assemblies on NCBI as of 5/11/2019**
@@ -22,7 +22,7 @@ Requirements:
 -Data integrity needs to be ensured with checksum from NCBI. 
 
 First all files must be downloaded(DONE)
-Second: a database must be created that can be populated with data from the program. The database should have a primary key being the assembly accession. Other info will be the organism, taxonomic information, codon usage statistics, and file containing 40 highly expressed genes. 
+Second: a database must be created that can be populated with data from the program. The database should have a primary key being the assembly accession. Other info will be the organism, taxonomic information, codon usage statistics, and file containing 40 highly expressed genes(name). 
 Third: Data must be indexed properly to ensure fast retrieval, aggregation and queries. (Elastic Search)
 3.5 Database queries connected to web application.
     Robustness, Security, Integrity of database. 
@@ -50,7 +50,10 @@ Here is a list of required dependencies
     5) flask http://flask.pocoo.org/
     6) requests module installable via pip3 install requests
     6) flask-bootstrap installable via pip3 install flask-bootstrap
+    7) flask-sqlalchemy
+    8) flask-migrate
 
+- Postgresql
 - Prodigal: https://github.com/hyattpd/Prodigal/wiki/installation
 
 
