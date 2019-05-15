@@ -7,8 +7,8 @@ Design:
 
 
 SQL Query language will be utilized to access a local database such as PostgreSQL
-OR
 Kibana and Elastic Search a will be utilzied to enable ultrafast search and visualization.
+Support for returning CSV files of all data will be added as well.
 
 Data will be stored on a local server running Linux and queries will be possible through a web application.
 Ideally visualization will be done live.
@@ -19,10 +19,13 @@ Requirements:
 -Website should allow for reasonable extension of functions. For example different kinds of queries to the coding sequences might be added later and highly expressed genes should be stored for every genome- This will be a fraction of the data from NCBI(16.3GB compressed).
 -Website should provide reasonable information on errors during annotation process.
 -Queries should return results immediately(should not take longer than a few seconds to query the entire database.(So if SQL doesn't work can we ADD elasticsearch?)
--Data integrity needs to be ensured with checksum from NCBI. 
+-Data integrity needs to be ensured with checksum from NCBI. This is challenging and time intensive. That can be done after database is setup ideally. Files should be retained. Any file with a checksum that doesn't match NCBI's checksum after unzipping should be listed. Otherwise the entire database can be rebuilt(time intensive approximately 3 days of nonstop downloading). Ideally this should update periodically using rsync but it might have to be done manually. More research on rsync is needed.
 
 First all files must be downloaded(DONE)
+1.5: Data needs to be processed with the programs methods from the Pipeline. Ideally a script will run the entire sequence. The data will be retrieved as a CSV file. 
 Second: a database must be created that can be populated with data from the program. The database should have a primary key being the assembly accession. Other info will be the organism, taxonomic information, codon usage statistics, and file containing 40 highly expressed genes(name). 
+
+
 Third: Data must be indexed properly to ensure fast retrieval, aggregation and queries. (Elastic Search)
 3.5 Database queries connected to web application.
     Robustness, Security, Integrity of database. 
