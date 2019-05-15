@@ -120,7 +120,7 @@ def uploader():
 					file.save(os.path.join(app.config['UPLOAD_FOLDER'] + '/' + temp, theSecureName))
 					os.chdir(tempdir)
 					facade.uploaded_genome(theSecureName, temp)
-					if os.path.isfile(text + "errors.txt"):
+					if os.path.isfile(theSecureName + "errors.txt"):
 						zip_of_files = __execute_zip_files(facade.file, "HEGS.fasta", theSecureName + "errors.txt")
 					else: 
 						zip_of_files = __execute_zip_files(facade.file, "HEGS.fasta")
