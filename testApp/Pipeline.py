@@ -34,8 +34,10 @@ class GeneralPipeline():
         with open(filename + ".bias.csv", 'w') as outcsv:
             writer = csv.writer(outcsv)
             if index.codon_exception != []:
-                for line in index.codon_exception:
-                    writer.writerow([line])
+                with open(filename + "errors.txt", 'w') as error_file:
+                    error_writer = csv.writer(error_file)
+                    for error in index.codon_exception:
+                        error_writer.writerow([error])
             writer.writerow(["Codon", "RCSU", "NRCSU", "HEG FB"])
             for entry in matrix:
                 writer.writerow(entry)

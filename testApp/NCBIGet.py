@@ -3,7 +3,7 @@ import bs4
 import re
 import os
 import subprocess
-
+import glob
 
 
 ## Base URL Of NCBI common to all URLS
@@ -80,8 +80,8 @@ def get_accession_data(accession):
 ## Constructs the download URL and gets the information onto the system
     lastPieceOfUrl = re.findall('[^\/]+$', url)[0]
     downloadUrl = url + "/" + lastPieceOfUrl + "_cds_from_genomic.fna.gz"
-    os.system("wget " + downloadUrl)
-    os.system("gunzip -f  *.gz")
+    subprocess.call(["wget", downloadUrl])
+    subprocess.Popen(["gunzip"] + glob.glob("*.gz"))
     return lastPieceOfUrl + "_cds_from_genomic.fna"
 
 def get_assembly_data(accession):
@@ -97,7 +97,7 @@ def get_assembly_data(accession):
     lastPieceOfUrl = re.findall('[^\/]+$', url)[0]
     downloadUrl = url + "/" + lastPieceOfUrl + "_cds_from_genomic.fna.gz"
     subprocess.call(["wget", downloadUrl])
-    subprocess.call(["gunzip", "-f", "*.gz"])
+    subprocess.Popen(["gunzip"] + glob.glob("*.gz"))
     return lastPieceOfUrl + "_cds_from_genomic.fna"
 
 
