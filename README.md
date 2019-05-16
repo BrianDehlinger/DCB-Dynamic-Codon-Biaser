@@ -1,3 +1,5 @@
+** Work is being done on readability, extensibility(comamnd pattern, chain of command, etc..., and adherence to PEP 8) ** 
+
 # DCB-Dynamic-Codon-Bias
 A web application for dynamically calculating the codon usage bias in bacterial genomes.
 
