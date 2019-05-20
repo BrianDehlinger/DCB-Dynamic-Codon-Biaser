@@ -8,7 +8,7 @@ import glob
 
 ## Base URL Of NCBI common to all URLS
 the_request = None
-temporaryURL = 'https://www.ncbi.nlm.nih.gov'
+NCBIBASEURL = 'https://www.ncbi.nlm.nih.gov'
 soup = None
 viewer_nucleotide = None
 viewer_soup = None
@@ -17,30 +17,30 @@ viewer_soup = None
 ## sidebar is parsed to find an assembly link. If an assembly link is not present then the 
 ## program will attempt to find the assembly link in the viewer. If however, the organsim is not a bacteria, then the program will raise an error. Similiary if there is no assembly link the program will also throw an error.
 
-def find_url(urlPiece, soup, viewer_soup):
+def _find_url(urlPiece, soup, viewer_soup):
     try:
-        theURL = ''
+        the_url = ''
         if 'Bacteria' not in str(viewer_soup):
             raise ValueError("The Nucleotide accession specified is not a Bacteria!")
         for a in soup.find_all('a', href=True):
             if('/assembly' in a['href']):
-                theURL = temporaryURL + a['href']
+                the_url = NCBIBASEURL + a['href']
                 break
-        if theURL:
-            return theURL
+        if the_url:
+            return the_url
         else:
             for a in viewer_soup.find_all('a', href=True):
                 if('/assembly' in a['href']):
-                    theURL = a['href']
+                    the_url = a['href']
                     break
-            if theURL:
-                return theURL
+            if the_url:
+                return the_url
             else: 
                 raise ValueError("Invalid accession, no assembly URL")
     except ValueError as e:
         print(e)
 
-def initialRequest(accession):
+def _initial_request(accession):
         global the_request
         the_request = requests.get("https://www.ncbi.nlm.nih.gov/nuccore/" + accession)
         global soup
@@ -52,11 +52,11 @@ def initialRequest(accession):
 
 ## Gets the HTML file for the NCBI accession number of interest.
 def get_accession_data(accession):
-    initialRequest(accession)
+    _initial_request(accession)
 
 ## Gets the URL for the Assembly link from NCBI's refseq accession
-    temporaryURL2 = find_url('/assembly', soup, viewer_soup)
-    new_request = requests.get(temporaryURL2)
+    temporary_url_two = _find_url('/assembly', soup, viewer_soup)
+    new_request = requests.get(temporary_url_two)
     new_soup = bs4.BeautifulSoup(new_request.text)
     
 
@@ -65,8 +65,8 @@ def get_accession_data(accession):
         items = new_soup.find("div", class_="rprt")
 
 ## Get's the assembly URL and gets the assembly url HTML file.
-        temporaryURL2 = find_url('/assembly', items, viewer_soup)
-        new_request = requests.get(temporaryURL2)
+        temporary_url_two = _find_url('/assembly', items, viewer_soup)
+        new_request = requests.get(temporary_url_two)
         new_soup = bs4.BeautifulSoup(new_request.text)
 
 ## Searches for the FTP File folder in the assembly HTML webpage.
@@ -78,11 +78,11 @@ def get_accession_data(accession):
             break
 
 ## Constructs the download URL and gets the information onto the system
-    lastPieceOfUrl = re.findall('[^\/]+$', url)[0]
-    downloadUrl = url + "/" + lastPieceOfUrl + "_cds_from_genomic.fna.gz"
+    last_piece_of_url = re.findall('[^\/]+$', url)[0]
+    downloadUrl = url + "/" + last_piece_of_url + "_cds_from_genomic.fna.gz"
     subprocess.call(["wget", downloadUrl])
     subprocess.Popen(["gunzip"] + glob.glob("*.gz"))
-    return lastPieceOfUrl + "_cds_from_genomic.fna"
+    return last_piece_of_url + "_cds_from_genomic.fna"
 
 def get_assembly_data(accession):
     the_request = requests.get("https://www.ncbi.nlm.nih.gov/assembly/" + accession)
@@ -94,28 +94,32 @@ def get_assembly_data(accession):
             url = a['href']
             break
 
-    lastPieceOfUrl = re.findall('[^\/]+$', url)[0]
-    downloadUrl = url + "/" + lastPieceOfUrl + "_cds_from_genomic.fna.gz"
+    last_piece_of_url = re.findall('[^\/]+$', url)[0]
+    downloadUrl = url + "/" + last_piece_of_url + "_cds_from_genomic.fna.gz"
     subprocess.call(["wget", downloadUrl])
     subprocess.Popen(["gunzip"] + glob.glob("*.gz"))
-    return lastPieceOfUrl + "_cds_from_genomic.fna"
+    return last_piece_of_url + "_cds_from_genomic.fna"
 
 
 def get_assembly_accession(accession):
-    initialRequest(accession)
-    temporaryURL2 = find_url('/assembly', soup, viewer_soup)
-    new_request = requests.get(temporaryURL2)
+    _initial_request(accession)
+    temporary_url_two = _find_url('/assembly', soup, viewer_soup)
+    new_request = requests.get(temporary_url_two)
     new_soup = bs4.BeautifulSoup(new_request.text)
     if not new_soup.find_all('a', attrs={'href': re.compile("^ftp://ftp.ncbi.nlm.nih.gov/genomes/all")}):
         items = new_soup.find("div", class_="rprt")
-        temporaryURL2 = find_url('/assembly', items, viewer_soup)
-        new_request = requests.get(temporaryURL2)
+        temporary_url_two = _find_url('/assembly', items, viewer_soup)
+        new_request = requests.get(temporary_url_two)
         new_soup = bs4.BeautifulSoup(new_request.text)
-    assemblyID = temporaryURL2.rsplit('/', 1)[-1]
-    if not assemblyID:
+    assembly_id = temporary_url_two.rsplit('/', 1)[-1]
+    if not assembly_id:
         raise ValueError("An error has occured at get_assembly_accession")
-    return assemblyID
+    return assembly_id
+  
+
+
     
+   
   
 
 

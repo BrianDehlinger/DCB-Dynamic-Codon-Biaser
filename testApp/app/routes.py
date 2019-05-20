@@ -15,11 +15,11 @@ import requests
 ALLOWED = set(['txt', 'fna', 'fasta'])
 
 ## Function that determines if a file has a specified file extension. 
-def allowed_file(filename):
+def _allowed_file(filename):
 	return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED
 
 # Command to execute an in memory zip
-def __execute_zip_files(*args):
+def _execute_zip_files(*args):
 	data = io.BytesIO()
 	with ZipFile(data, mode='w') as zip_of_files:
 		for file_to_zip in args:
@@ -29,7 +29,7 @@ def __execute_zip_files(*args):
 
 
 ## Command to send a file
-def __execute_send_file(data, name_of_zip_file):
+def _execute_send_file(data, name_of_zip_file):
 	return send_file(data, attachment_filename = name_of_zip_file, as_attachment=True)
 	
 
@@ -78,11 +78,11 @@ def my_form_post():
 				os.chdir(tempdir)
 				facade.ncbi(text, temp)
 				if os.path.isfile(text + "errors.txt"):
-					zip_of_files = __execute_zip_files(facade.file, "HEGS.fasta", text + "errors.txt")
+					zip_of_files = _execute_zip_files(facade.file, "HEGS.fasta", text + "errors.txt")
 				else: 
-					zip_of_files = __execute_zip_files(facade.file, "HEGS.fasta")
+					zip_of_files = _execute_zip_files(facade.file, "HEGS.fasta")
 				os.chdir("..")
-				return __execute_send_file(zip_of_files, text + ".zip")
+				return _execute_send_file(zip_of_files, text + ".zip")
 		except Exception as e:
 			print(e)
 			flash('There was an error, please make sure the RefSeq Accession has an assembly, and is a bacterial genome. Also please try reuploading the genome. The server may be busy.')
@@ -108,7 +108,7 @@ def uploader():
 		if file.filename == '':
 			flash('Please select a file to upload')
 			return redirect('/upload')
-		if file and allowed_file(file.filename):
+		if file and _allowed_file(file.filename):
 			try:
 				theSecureName = secure_filename(file.filename)
 				if (theSecureName == ''):
@@ -121,11 +121,11 @@ def uploader():
 					os.chdir(tempdir)
 					facade.uploaded_genome(theSecureName, temp)
 					if os.path.isfile(theSecureName + "errors.txt"):
-						zip_of_files = __execute_zip_files(facade.file, "HEGS.fasta", theSecureName + "errors.txt")
+						zip_of_files = _execute_zip_files(facade.file, "HEGS.fasta", theSecureName + "errors.txt")
 					else: 
-						zip_of_files = __execute_zip_files(facade.file, "HEGS.fasta")
+						zip_of_files = _execute_zip_files(facade.file, "HEGS.fasta")
 					os.chdir("..")
-					return __execute_send_file(zip_of_files, theSecureName + ".zip")
+					return _execute_send_file(zip_of_files, theSecureName + ".zip")
 			except Exception as e:
 				print(e)
 				flash("There was an error! Please make sure file is in nucleotide fasta format and is a complete genome. Then try reuploading the genome, server may be busy.")
@@ -161,11 +161,11 @@ def assembly_post():
 				os.chdir(tempdir)
 				facade.ncbiassembly(text, temp)
 				if os.path.isfile(text + "errors.txt"):
-					zip_of_files = __execute_zip_files(facade.file, "HEGS.fasta", text + "errors.txt")
+					zip_of_files = _execute_zip_files(facade.file, "HEGS.fasta", text + "errors.txt")
 				else: 
-					zip_of_files = __execute_zip_files(facade.file, "HEGS.fasta")
+					zip_of_files = _execute_zip_files(facade.file, "HEGS.fasta")
 				os.chdir("..")
-				return __execute_send_file(zip_of_files, text + ".zip")
+				return _execute_send_file(zip_of_files, text + ".zip")
 		except Exception as e:
 			print(e)
 			flash('There was an error, please make sure the RefSeq Accession has an assembly, and is a bacterial genome. Also please try reuploading the genome. The server may be busy.')
