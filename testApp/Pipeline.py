@@ -141,6 +141,3 @@ class Facade:
         ncbipipe._calculate_bias("HEGS.fasta", accession)
         self.file = accession + ".bias.csv"
 
-
-
-

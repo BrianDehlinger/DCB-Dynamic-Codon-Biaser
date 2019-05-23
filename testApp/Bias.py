@@ -99,11 +99,15 @@ class CodonUsageTable(object):
 
             for codon in codons:
                 total += self.codon_count[codon]
+            
 
             # calculate the RSCU value for each of the codons
             for codon in codons:
                 denominator = float(total) / len(codons)
-                rcsu.append(self.codon_count[codon] / denominator)
+                if denominator == 0.0:
+                    rcsu.append(0.0)
+                else:
+                    rcsu.append(self.codon_count[codon] / denominator)
 
             # now add the RCSU values to the table
             for codon_index, codon in enumerate(codons):
@@ -139,7 +143,10 @@ class CodonUsageTable(object):
             # calculate the NRSCU value for each of the codons
             for codon in codons:
                 denominator = float(total)
-                nrcsu.append(self.codon_count[codon] / denominator)
+                if denominator == 0.0:
+                    nrcsu.append(0.0)
+                else:
+                    nrcsu.append(self.codon_count[codon] / denominator)
 
             # now add the NRCSU values to the table
             for codon_index, codon in enumerate(codons):
@@ -176,7 +183,10 @@ class CodonUsageTable(object):
             ## THIS CALCULATION IS INCORRECT!
             for codon in codons:
                 denominator = self.total_codons
-                hegfb.append(self.codon_count[codon] / denominator)
+                if denominator == 0.0:
+                    hegfb.append(0.0)
+                else: 
+                    hegfb.append(self.codon_count[codon] / denominator)
 
             # now add the HEG FB values to the table
             for codon_index, codon in enumerate(codons):
@@ -224,3 +234,4 @@ class CodonUsageTable(object):
         print("HEG FB")
         for i in sorted(self.hegfb_index):
             print("%s\t%.f" % (i, self.hegfb_index[i]))
+
