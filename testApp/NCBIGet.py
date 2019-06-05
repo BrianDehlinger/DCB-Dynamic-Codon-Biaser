@@ -7,11 +7,8 @@ import glob
 
 
 ## Base URL Of NCBI common to all URLS
-the_request = None
 NCBIBASEURL = 'https://www.ncbi.nlm.nih.gov'
-soup = None
-viewer_nucleotide = None
-viewer_soup = None
+
 
 ## Function that finds first href that contain part of the urlPiece in the url. First the NCBI
 ## sidebar is parsed to find an assembly link. If an assembly link is not present then the 
@@ -40,19 +37,22 @@ def _find_url(urlPiece, soup, viewer_soup):
     except ValueError as e:
         print(e)
 
-def _initial_request(accession):
-        global the_request
-        the_request = requests.get("https://www.ncbi.nlm.nih.gov/nuccore/" + accession)
-        global soup
-        soup = bs4.BeautifulSoup(the_request.text)
-        global viewer_nucleotide
-        viewerNucleotide = requests.get("https://www.ncbi.nlm.nih.gov/sviewer/viewer.fcgi?id="+accession+"&db=nuccore&extrafeat=0&fmt_mask=0&retmod=html&withmarkup=on&tool=portal&log")
-        global viewer_soup
-        viewer_soup = bs4.BeautifulSoup(viewerNucleotide.text)
+def _get_soup_nuccore(accession):
+    the_request = requests.get("https://www.ncbi.nlm.nih.gov/nuccore/" + accession)
+    return bs4.BeautifulSoup(the_request.text)
+		
+def _get_viewer_soup_nuccore(accession):
+    viewerNucleotide = requests.get("https://www.ncbi.nlm.nih.gov/sviewer/viewer.fcgi?id="+accession+"&db=nuccore&extrafeat=0&fmt_mask=0&retmod=html&withmarkup=on&tool=portal&log")
+    return bs4.BeautifulSoup(viewerNucleotide.text)
 
-## Gets the HTML file for the NCBI accession number of interest.
+def _get_soup_assembly(accession):
+    the_request = requests.get("https://www.ncbi.nlm.nih.gov/assembly/" + accession)
+    return bs4.BeautifulSoup(the_request.text)
+
+## Gets the HTML file for the NCBI accession number of interest. Utilizes commands instead of global variables to reduce semantic coupling!
 def get_accession_data(accession):
-    _initial_request(accession)
+    soup = _get_soup_nuccore(accession)
+    viewer_soup = _get_viewer_soup_nuccore(accession)
 
 ## Gets the URL for the Assembly link from NCBI's refseq accession
     temporary_url_two = _find_url('/assembly', soup, viewer_soup)
@@ -85,15 +85,13 @@ def get_accession_data(accession):
     return last_piece_of_url + "_cds_from_genomic.fna"
 
 def get_assembly_data(accession):
-    the_request = requests.get("https://www.ncbi.nlm.nih.gov/assembly/" + accession)
-    soup = bs4.BeautifulSoup(the_request.text)
+    soup = _get_soup_assembly(accession)
     url = ''
     items = soup.find_all('a', href=True)
     for a in items:
         if "ftp://" in a['href']:
             url = a['href']
             break
-
     last_piece_of_url = re.findall('[^\/]+$', url)[0]
     downloadUrl = url + "/" + last_piece_of_url + "_cds_from_genomic.fna.gz"
     subprocess.call(["wget", downloadUrl])
@@ -102,7 +100,8 @@ def get_assembly_data(accession):
 
 
 def get_assembly_accession(accession):
-    _initial_request(accession)
+    soup = _get_soup_nuccore(accession)
+    viewer_soup = _get_viewer_soup_nuccore(accession)
     temporary_url_two = _find_url('/assembly', soup, viewer_soup)
     new_request = requests.get(temporary_url_two)
     new_soup = bs4.BeautifulSoup(new_request.text)
@@ -118,7 +117,7 @@ def get_assembly_accession(accession):
   
 
 
-    
+ 
    
   
 
