@@ -6,7 +6,7 @@ A web application for dynamically calculating the codon usage bias in bacterial 
 Design:
 
 
-SQL Query language will be utilized to access a local database such as PostgreSQL
+SQL Query language will be utilized to access a Postgresql database
 Kibana and Elastic Search a will be utilzied to enable ultrafast search and visualization.
 Support for returning CSV files of all data will be added as well.
 
@@ -15,7 +15,7 @@ Ideally visualization will be done live.
 
 Requirements:
 
--Website should be concurrent, so code must be written to prevent concurrency issues.
+-Website should be concurrent, so code must be written to prevent concurrency issues. (Postgresql reads only on live web app)
 -Website should allow for reasonable extension of functions. For example different kinds of queries to the coding sequences might be added later and highly expressed genes should be stored for every genome- This will be a fraction of the data from NCBI(16.3GB compressed).
 -Website should provide reasonable information on errors during annotation process.
 -Queries should return results immediately(should not take longer than a few seconds to query the entire database.(So if SQL doesn't work can we ADD elasticsearch?)
@@ -55,6 +55,7 @@ Here is a list of required dependencies
     6) flask-bootstrap installable via pip3 install flask-bootstrap
     7) flask-sqlalchemy
     8) flask-migrate
+ -Postgresql 
 
 - Postgresql
 - Prodigal: https://github.com/hyattpd/Prodigal/wiki/installation
