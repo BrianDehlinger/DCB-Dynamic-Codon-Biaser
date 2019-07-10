@@ -19,23 +19,24 @@ Here is a list of required dependencies
 
 # Setup and Installation
 
-*Ensure all dependencies are installed before these steps*
+Ensure all dependencies are installed before these steps*
 
-* Clone this repository onto the local machine using git clone. The folder you clone it into will be the parent directory for the repository
-* Manually go into folder parent-directory-here/Dynamic-Codon-Bias/testApp/app/__init__.py
-* Configure the UPLOAD_FOLDER name to wherever the cloned repo is. For example r"/home/bdehlinger/DCB-Dynamic-Codon-Bias/testApp". You must include the folder up until testApp for the configuration to work properly.
-* Configure the MAX_CONTENT_LENGTH to desired max upload size. 16MB is 16 * 1024 *1024. Whereas 18MB is 18 * 1024 * 1024.
-
+```
+Clone this repository onto the local machine using git clone. The folder you clone it into will be the parent directory for the repository
+Manually go into folder parent-directory-here/Dynamic-Codon-Bias/testApp/app/__init__.py
+Configure the UPLOAD_FOLDER name to wherever the cloned repo is. For example r"/home/bdehlinger/DCB-Dynamic-Codon-Bias/testApp". You must include the folder up until testApp for the configuration to work properly.
+Configure the MAX_CONTENT_LENGTH to desired max upload size. 16MB is 16 * 1024 *1024. Whereas 18MB is 18 * 1024 * 1024.
+```
 
 # Running the Web Application:
 
-* Go to a terminal and change  your view to the testApp subfolder
-* Enter the command: $ python3 -m flask run
-* Local web server will be up. This is NOT concurrent and it is highly discouraged to use the flask run command in production.
+```
+Go to a terminal and change  your view to the testApp subfolder
+Enter the command: $ python3 -m flask run
+Local web server will be up. This is NOT concurrent and it is highly discouraged to use the flask run command in production.
+```
 
-You may choose any number of methods for deployment!
-
-Gunicorn is our choice.
+You may choose any number of methods for deployment! Flask is not meant for production use cases.
 
 # References
 
@@ -55,6 +56,6 @@ Gunicorn is our choice.
   
 
 
-Note:
+### Note:
 
 Program runs in about 8.14 seconds on an averaged sized bacterial genome. 
