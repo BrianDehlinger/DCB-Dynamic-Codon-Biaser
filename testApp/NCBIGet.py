@@ -71,11 +71,9 @@ def get_accession_data(accession):
 
 ## Searches for the FTP File folder in the assembly HTML webpage.
     url = ''
-    items = new_soup.find_all('a', href=True)
-    for a in items:
-        if "ftp://" in a['href']:
-            url = a['href']
-            break
+    item = new_soup.find('a', href=True, text='FTP directory for RefSeq assembly')
+    url = item['href']
+
 
 ## Constructs the download URL and gets the information onto the system
     last_piece_of_url = re.findall('[^\/]+$', url)[0]
@@ -87,11 +85,9 @@ def get_accession_data(accession):
 def get_assembly_data(accession):
     soup = _get_soup_assembly(accession)
     url = ''
-    items = soup.find_all('a', href=True)
-    for a in items:
-        if "ftp://" in a['href']:
-            url = a['href']
-            break
+    item = soup.find('a', href=True, text='FTP directory for RefSeq assembly')
+    url = item['href']
+	
     last_piece_of_url = re.findall('[^\/]+$', url)[0]
     downloadUrl = url + "/" + last_piece_of_url + "_cds_from_genomic.fna.gz"
     subprocess.call(["wget", downloadUrl])
