@@ -15,7 +15,7 @@ import logging
 import traceback
 
 logger = logging.getLogger("DCB")
-handle = logging.FileHandler('/var/log/DCB.log', 'w')
+handle = logging.FileHandler('/var/log/tmp/DCB.log', 'w')
 logger.addHandler(handle)
 logger.setLevel("DEBUG")
 
