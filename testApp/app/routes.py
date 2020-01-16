@@ -11,6 +11,15 @@ import requests
 
 
 
+import logging
+import traceback
+
+logger = logging.getLogger("DCB")
+handle = logging.FileHandler('/var/log/DCB.log', 'w')
+logger.addHandler(handle)
+logger.setLevel("DEBUG")
+
+
 ## Set the allowed file extensions here
 ALLOWED = set(['txt', 'fna', 'fasta'])
 
@@ -84,8 +93,8 @@ def my_form_post():
 				os.chdir("..")
 				return _execute_send_file(zip_of_files, text + ".zip")
 		except Exception as e:
-			print(e)
-			flash('There was an error, please make sure the RefSeq Accession has an assembly, and is a bacterial genome. Also please try reuploading the genome. The server may be busy.')
+			logger.exception("Exception has occured in routes.py at my_form_post method")
+			flash('Please make sure the RefSeq Accession has an assembly, and is a bacterial genome. Also please try reuploading the genome. The server may be busy.')
 			return redirect('/ncbi')
 	
 
@@ -127,7 +136,7 @@ def uploader():
 					os.chdir("..")
 					return _execute_send_file(zip_of_files, theSecureName + ".zip")
 			except Exception as e:
-				print(e)
+				logger.exception("Exception has occured in routes.py at uploader method")
 				flash("There was an error! Please make sure file is in nucleotide fasta format and is a complete genome. Then try reuploading the genome, server may be busy.")
 				return redirect('/upload')
 		else: 
@@ -150,7 +159,7 @@ def assembly_post():
 			if the_request.status_code == 404:
 			    raise ValueError("The RefSeq Assemmbly Accession number is invalid")
 		except ValueError as e:
-			print(e)
+			loggger.exception("Exception has occured in routes.py at assembly_post method")
 			flash('The RefSeq Assembly Accession number is invalid')
 			return redirect('/ncbiassembly')
 			
@@ -167,7 +176,7 @@ def assembly_post():
 				os.chdir("..")
 				return _execute_send_file(zip_of_files, text + ".zip")
 		except Exception as e:
-			print(e)
+			logger.exception("Exception has occured in routes.py at assembly_post method")
 			flash('There was an error, please make sure the RefSeq Accession has an assembly, and is a bacterial genome. Also please try reuploading the genome. The server may be busy.')
 			return redirect('/ncbiassembly')
 
