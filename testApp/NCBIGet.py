@@ -1,9 +1,9 @@
 import requests
 import bs4
 import re
-import os
-import subprocess
 import glob
+import gzip
+import io
 
 
 ## Base URL Of NCBI common to all URLS
@@ -78,48 +78,23 @@ def get_accession_data(accession):
 ## Constructs the download URL and gets the information onto the system
     last_piece_of_url = re.findall('[^\/]+$', url)[0]
     downloadUrl = url + "/" + last_piece_of_url + "_cds_from_genomic.fna.gz"
-    subprocess.call(["wget", downloadUrl])
-    subprocess.Popen(["gunzip"] + glob.glob("*.gz"))
-    return last_piece_of_url + "_cds_from_genomic.fna"
+
+    decompressed_data = gzip.decompress(requests.get(download_url).content)
+    return {"filename": last_piece_of_url + "_cds_from_genomic.fna",
+            "data": decompressed_data}
 
 def get_assembly_data(accession):
     soup = _get_soup_assembly(accession)
-    url = ''
     item = soup.find('a', href=True, text='FTP directory for RefSeq assembly')
     url = item['href']
-	
+
     last_piece_of_url = re.findall('[^\/]+$', url)[0]
-    downloadUrl = url + "/" + last_piece_of_url + "_cds_from_genomic.fna.gz"
-    subprocess.call(["wget", downloadUrl])
-    subprocess.Popen(["gunzip"] + glob.glob("*.gz"))
-    return last_piece_of_url + "_cds_from_genomic.fna"
+    download_url = url + "/" + last_piece_of_url + "_cds_from_genomic.fna.gz"
+    decompressed_data = gzip.decompress(requests.get(download_url).content)
+    #return last_piece_of_url + "_cds_from_genomic.fna"
+    return {"filename": last_piece_of_url + "_cds_from_genomic.fna",
+            "data": decompressed_data}
 
-
-def get_assembly_accession(accession):
-    soup = _get_soup_nuccore(accession)
-    viewer_soup = _get_viewer_soup_nuccore(accession)
-    temporary_url_two = _find_url('/assembly', soup, viewer_soup)
-    new_request = requests.get(temporary_url_two)
-    new_soup = bs4.BeautifulSoup(new_request.text)
-    if not new_soup.find_all('a', attrs={'href': re.compile("^ftp://ftp.ncbi.nlm.nih.gov/genomes/all")}):
-        items = new_soup.find("div", class_="rprt")
-        temporary_url_two = _find_url('/assembly', items, viewer_soup)
-        new_request = requests.get(temporary_url_two)
-        new_soup = bs4.BeautifulSoup(new_request.text)
-    assembly_id = temporary_url_two.rsplit('/', 1)[-1]
-    if not assembly_id:
-        raise ValueError("An error has occured at get_assembly_accession")
-    return assembly_id
-  
-
-
- 
-   
-  
-
-
-    
-   
 
 
 
