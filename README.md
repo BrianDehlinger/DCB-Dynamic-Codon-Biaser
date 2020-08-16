@@ -1,6 +1,14 @@
 # DCB-Dynamic-Codon-Bias
 A web application for dynamically calculating the codon usage bias in bacterial genomes.
 
+1) Get Prodigal to run on Lambda
+2) Get Diamond to run on lambda
+3) allow for the use of temporary file directories on lambda.
+4) Define UI without flask using JS 
+5) API gateway 
+6) Lambda function that dispatches to bundled code instead of routes.py.
+7) Then the code produces a zip file and sends to user
+
 # Dependenices:
 
 Here is a list of required dependencies
