@@ -34,7 +34,8 @@ def _execute_zip_files(data_bundle: dict):
 	data_bundle.pop('file_name')
 	with ZipFile(data, mode='w') as zip_of_files:
 		for key, file_data_to_zip in data_bundle.items():
-			zip_of_files.writestr(file_name + '-' + key, file_data_to_zip)
+			if file_data_to_zip:
+				zip_of_files.writestr(file_name + '-' + key, file_data_to_zip)
 	data.seek(0)
 	return data
 
@@ -116,9 +117,7 @@ def uploader():
 				temp_file_buffer = io.StringIO()
 				genome_data = None
 				with temp_file_buffer:
-					file.save(temp_file_buffer)
-					temp_file_buffer.seek(0)
-					genome_data = temp_file_buffer.read()
+					genome_data = file.read().decode("utf-8")
 				result = facade.uploaded_genome(theSecureName, genome_data)
 				zip_of_files = _execute_zip_files(result)
 				return _execute_send_file(zip_of_files, theSecureName + ".zip")
@@ -143,7 +142,7 @@ def assembly_post():
 		facade = Facade()
 		# Redo this in a function to segregate logic. 
 		try:
-			the_request = requests.get("https://ncbi.nlm.nih.gov/assembly/" + text)
+			the_request = requests.get("https://ncbi.nlm.nih.gov/assembly/" + accession)
 			if the_request.status_code == 404:
 			    raise ValueError("The RefSeq Assemmbly Accession number is invalid")
 		except ValueError as e:
@@ -154,7 +153,7 @@ def assembly_post():
 		try:
 			result = facade.ncbiassembly(accession)
 			zip_of_files = _execute_zip_files(result)
-			return _execute_send_file(zip_of_files, text + ".zip")
+			return _execute_send_file(zip_of_files, accession + ".zip")
 		except Exception as e:
 			logger.exception("Exception has occured in routes.py at assembly_post method")
 			flash('There was an error, please make sure the RefSeq Accession has an assembly, and is a bacterial genome. Also please try reuploading the genome. The server may be busy.')

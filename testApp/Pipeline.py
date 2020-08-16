@@ -51,13 +51,13 @@ class GeneralPipeline():
                 error_writer.writerow([error])
             error_buffer.seek(0)
             error_output = error_buffer.read()
+            error_buffer.close()
         writer.writerow(["Codon", "RCSU", "NRCSU", "HEG FB"])
         for entry in matrix:
             writer.writerow(entry)
         output_buffer.seek(0)
         output = output_buffer.read()
         output_buffer.close()
-        error_buffer.close()
         return {"filename": filename, "output": output, "errors": error_output}
 
     # Reads in the matches from diamond. This function then cleans up and standarizes the output so that there are at most 40 highly expressed
@@ -151,7 +151,7 @@ class NcbiAssemblyPipe(GeneralPipeline):
     # Self.file is the file name of the downloaded fasta file.
     def _get_data(self, accession):
         assembly_data = get_assembly_data(accession)
-        self.cds_data = assembly_data['data']
+        self.cds_data = assembly_data['data'].decode("utf-8")
         self.file_name = assembly_data['filename']
 
 
@@ -167,7 +167,7 @@ class GenomePipe(GeneralPipeline):
             temp_output_file = os.path.join(tmpdir, 'prodigal_output')
             with open(temp_input_file_to_prodigal, 'w') as file:
                 file.write(genome_data)
-            subprocess.call(["/tmp/prodigal",
+            subprocess.call(["prodigal",
                              "-i",
                              temp_input_file_to_prodigal,
                              "-o",
@@ -198,10 +198,13 @@ class Facade:
     def uploaded_genome(self, file_name, genome_data):
         genomepipe = GenomePipe()
         genomepipe._get_data(file_name, genome_data)
-        hegs_fasta = genomepipe.get_hegs(file_name)["hegs"]
+        hegs_fasta = genomepipe.get_hegs(file_name)
         index, matrix = genomepipe.calculate_bias(hegs_fasta)
         parseable_result = genomepipe.write_bias(file_name, index, matrix)
         csv_output, errors = parseable_result['output'], parseable_result['errors']
+        print(hegs_fasta)
+        print(csv_output)
+        print(errors)
         return {
             "hegs": hegs_fasta['hegs'],
             "file_name": file_name,
