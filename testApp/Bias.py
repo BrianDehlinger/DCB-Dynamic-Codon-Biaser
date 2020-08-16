@@ -71,7 +71,6 @@ class CodonUsageTable(object):
         self.total_codons = 0
         self.codon_exception = []
 
-
     def generate_rcsu_table(self):
         """Generate a codon usage table from a FASTA file of CDS sequences.
 
@@ -99,7 +98,6 @@ class CodonUsageTable(object):
 
             for codon in codons:
                 total += self.codon_count[codon]
-            
 
             # calculate the RSCU value for each of the codons
             for codon in codons:
@@ -111,7 +109,7 @@ class CodonUsageTable(object):
 
             # now add the RCSU values to the table
             for codon_index, codon in enumerate(codons):
-                self.rcsu_index[codon] = round(rcsu[codon_index],6)
+                self.rcsu_index[codon] = round(rcsu[codon_index], 6)
 
     def generate_nrcsu_table(self):
         """Generate a codon usage table from a FASTA file of CDS sequences.
@@ -172,7 +170,8 @@ class CodonUsageTable(object):
         # synonymous codons were used all together.
         for aa in SynonymousCodons:
             total = 0.0
-            # HEG FB values are CodonCount/sum of all synonymous codons * sum of all codons in dataset
+            # HEG FB values are CodonCount/sum of all synonymous codons * sum
+            # of all codons in dataset
             hegfb = []
             codons = SynonymousCodons[aa]
 
@@ -180,18 +179,17 @@ class CodonUsageTable(object):
                 total += self.codon_count[codon]
 
             # calculate the HEG FB value for each of the codons
-            ## THIS CALCULATION IS INCORRECT!
+            # THIS CALCULATION IS INCORRECT!
             for codon in codons:
                 denominator = self.total_codons
                 if denominator == 0.0:
                     hegfb.append(0.0)
-                else: 
+                else:
                     hegfb.append(self.codon_count[codon] / denominator)
 
             # now add the HEG FB values to the table
             for codon_index, codon in enumerate(codons):
                 self.hegfb_index[codon] = round(hegfb[codon_index], 9)
-
 
     def _count_codons(self, fasta_file):
         with open(fasta_file, 'r') as handle:
@@ -212,12 +210,14 @@ class CodonUsageTable(object):
                         self.codon_count[codon] += 1
                         self.total_codons += 1
                     else:
-                        self.codon_exception.append("Illegal codon %s in gene %s, this data may be inaccurate!" % (codon, cur_record.id))
+                        self.codon_exception.append(
+                            "Illegal codon %s in gene %s, this data may be inaccurate!" %
+                            (codon, cur_record.id))
 
     def print_rcsu_table(self):
         """Print out the RCSU table.
         """
-        print ("RCSU")
+        print("RCSU")
         for i in sorted(self.rcsu_index):
             print("%s\t%.3f" % (i, self.rcsu_index[i]))
 
@@ -234,4 +234,3 @@ class CodonUsageTable(object):
         print("HEG FB")
         for i in sorted(self.hegfb_index):
             print("%s\t%.f" % (i, self.hegfb_index[i]))
-

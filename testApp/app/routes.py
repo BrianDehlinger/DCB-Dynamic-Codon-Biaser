@@ -15,7 +15,7 @@ import logging
 import traceback
 
 logger = logging.getLogger("DCB")
-handle = logging.FileHandler('/var/log/tmp/DCB.log', 'w')
+handle = logging.FileHandler('DCB.log', 'w')
 logger.addHandler(handle)
 logger.setLevel("DEBUG")
 
@@ -23,16 +23,18 @@ logger.setLevel("DEBUG")
 ## Set the allowed file extensions here
 ALLOWED = set(['txt', 'fna', 'fasta'])
 
-## Function that determines if a file has a specified file extension. 
+## Function that determines if a file has a specified file extension.
 def _allowed_file(filename):
 	return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED
 
 # Command to execute an in memory zip
-def _execute_zip_files(*args):
+def _execute_zip_files(data_bundle: dict):
 	data = io.BytesIO()
+	file_name = data_bundle['file_name']
+	data_bundle.pop('file_name')
 	with ZipFile(data, mode='w') as zip_of_files:
-		for file_to_zip in args:
-			zip_of_files.write(file_to_zip)
+		for key, file_data_to_zip in data_bundle.items():
+			zip_of_files.writestr(file_name + '-' + key, file_data_to_zip)
 	data.seek(0)
 	return data
 
@@ -40,11 +42,6 @@ def _execute_zip_files(*args):
 ## Command to send a file
 def _execute_send_file(data, name_of_zip_file):
 	return send_file(data, attachment_filename = name_of_zip_file, as_attachment=True)
-	
-
-
-
-
 
 
 ## Defines the route that the flask app will go when the user does not specify anything after the first slash. This page has two request forms. A user can navigate to either the NCBI or USER UPLOAD PAGE
@@ -78,20 +75,13 @@ def ncbi():
 @app.route('/ncbidata', methods = ['POST'])
 def my_form_post():
 	if request.method == 'POST':
-		text = request.form['text']
+		accession = request.form['text']
 		facade = Facade()
 		try:
-			os.chdir(app.config['UPLOAD_FOLDER'])
-			with tempfile.TemporaryDirectory(dir=os.getcwd()) as tempdir:
-				temp = tempdir.rsplit('/', 1)[-1]
-				os.chdir(tempdir)
-				facade.ncbi(text, temp)
-				if os.path.isfile(text + "errors.txt"):
-					zip_of_files = _execute_zip_files(facade.file, "HEGS.fasta", text + "errors.txt")
-				else: 
-					zip_of_files = _execute_zip_files(facade.file, "HEGS.fasta")
-				os.chdir("..")
-				return _execute_send_file(zip_of_files, text + ".zip")
+			result = facade.ncbi(accession)
+			hegs, file_name, bias_file, errors = result['hegs'], result['file_name'], result['csv_data'], result['errors']
+			zip_of_files = _execute_zip_files(result)
+			return _execute_send_file(zip_of_files, accession + ".zip")
 		except Exception as e:
 			logger.exception("Exception has occured in routes.py at my_form_post method")
 			flash('Please make sure the RefSeq Accession has an assembly, and is a bacterial genome. Also please try reuploading the genome. The server may be busy.')
@@ -120,21 +110,18 @@ def uploader():
 		if file and _allowed_file(file.filename):
 			try:
 				theSecureName = secure_filename(file.filename)
-				if (theSecureName == ''):
-					theSecureName = "YourGenome"	
+				if theSecureName == '':
+					theSecureName = "YourGenome"
 				facade = Facade()
-				os.chdir(app.config['UPLOAD_FOLDER'])
-				with tempfile.TemporaryDirectory(dir=os.getcwd()) as tempdir:
-					temp = tempdir.rsplit('/', 1)[-1]
-					file.save(os.path.join(app.config['UPLOAD_FOLDER'] + '/' + temp, theSecureName))
-					os.chdir(tempdir)
-					facade.uploaded_genome(theSecureName, temp)
-					if os.path.isfile(theSecureName + "errors.txt"):
-						zip_of_files = _execute_zip_files(facade.file, "HEGS.fasta", theSecureName + "errors.txt")
-					else: 
-						zip_of_files = _execute_zip_files(facade.file, "HEGS.fasta")
-					os.chdir("..")
-					return _execute_send_file(zip_of_files, theSecureName + ".zip")
+				temp_file_buffer = io.StringIO()
+				genome_data = None
+				with temp_file_buffer:
+					file.save(temp_file_buffer)
+					temp_file_buffer.seek(0)
+					genome_data = temp_file_buffer.read()
+				result = facade.uploaded_genome(theSecureName, genome_data)
+				zip_of_files = _execute_zip_files(result)
+				return _execute_send_file(zip_of_files, theSecureName + ".zip")
 			except Exception as e:
 				logger.exception("Exception has occured in routes.py at uploader method")
 				flash("There was an error! Please make sure file is in nucleotide fasta format and is a complete genome. Then try reuploading the genome, server may be busy.")
@@ -152,8 +139,9 @@ def ncbiassembly():
 @app.route('/ncbiassemblydata', methods = ['POST'])
 def assembly_post():
 	if request.method == 'POST':
-		text = request.form['text']
+		accession = request.form['text']
 		facade = Facade()
+		# Redo this in a function to segregate logic. 
 		try:
 			the_request = requests.get("https://ncbi.nlm.nih.gov/assembly/" + text)
 			if the_request.status_code == 404:
@@ -164,17 +152,9 @@ def assembly_post():
 			return redirect('/ncbiassembly')
 			
 		try:
-			os.chdir(app.config['UPLOAD_FOLDER'])
-			with tempfile.TemporaryDirectory(dir=os.getcwd()) as tempdir:
-				temp = tempdir.rsplit('/', 1)[-1]
-				os.chdir(tempdir)
-				facade.ncbiassembly(text, temp)
-				if os.path.isfile(text + "errors.txt"):
-					zip_of_files = _execute_zip_files(facade.file, "HEGS.fasta", text + "errors.txt")
-				else: 
-					zip_of_files = _execute_zip_files(facade.file, "HEGS.fasta")
-				os.chdir("..")
-				return _execute_send_file(zip_of_files, text + ".zip")
+			result = facade.ncbiassembly(accession)
+			zip_of_files = _execute_zip_files(result)
+			return _execute_send_file(zip_of_files, text + ".zip")
 		except Exception as e:
 			logger.exception("Exception has occured in routes.py at assembly_post method")
 			flash('There was an error, please make sure the RefSeq Accession has an assembly, and is a bacterial genome. Also please try reuploading the genome. The server may be busy.')

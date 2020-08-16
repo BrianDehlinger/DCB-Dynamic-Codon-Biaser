@@ -7,15 +7,18 @@ import csv
 import io
 import subprocess
 import tempfile
+import shutil
 
 
 class GeneralPipeline():
     def __init__(self):
         self.file = ''
 
-    def _calculate_bias(self, raw_fasta):
+    def calculate_bias(self, raw_fasta):
         tmpdir = tempfile.mkdtemp()
         fasta = os.path.join(tmpdir, 'fasta_input_to_bio_python')
+        with open(fasta, 'w') as f:
+            f.write(raw_fasta['hegs'])
         index = CodonUsageTable(fasta)
         index.generate_rcsu_table()
         index.generate_nrcsu_table()
@@ -34,18 +37,18 @@ class GeneralPipeline():
         for item in sorted(index.hegfb_index):
             matrix[i][3] = index.hegfb_index[item]
             i += 1
-        os.rmdir(tmpdir)
+        shutil.rmtree(tmpdir)
         return index, matrix
 
-    def _write_bias(self, filename, index, matrix):
+    def write_bias(self, filename, index, matrix):
         output_buffer = io.StringIO()
         error_output = None
         writer = csv.writer(output_buffer)
         if index.codon_exception != []:
             error_buffer = io.StringIO()
             error_writer = csv.writer(error_buffer)
-                for error in index.codon_exception:
-                    error_writer.writerow([error])
+            for error in index.codon_exception:
+                error_writer.writerow([error])
             error_buffer.seek(0)
             error_output = error_buffer.read()
         writer.writerow(["Codon", "RCSU", "NRCSU", "HEG FB"])
@@ -57,27 +60,35 @@ class GeneralPipeline():
         error_buffer.close()
         return {"filename": filename, "output": output, "errors": error_output}
 
-    ## Reads in the matches from diamond. This function then cleans up and standarizes the output so that there are at most 40 highly expressed 
-    ## Genes in an output file called temporary.fasta. Elongation factor EF-2 is replaced with elongation factor G because they are actually
-    ## the same protein. File is outputed as HEGS.fasta.
-    def _get_hegs_to_forty_items(self, diamond_output, tmpdir):
+    # Reads in the matches from diamond. This function then cleans up and standarizes the output so that there are at most 40 highly expressed
+    # Genes in an output file called temporary.fasta. Elongation factor EF-2 is replaced with elongation factor G because they are actually
+    # the same protein. File is outputed as HEGS.fasta.
+    def _get_hegs_to_forty_items(self, diamond_output, tmpdir, temp_cds_file):
         input_buffer = io.StringIO(diamond_output)
         df = None
         with input_buffer:
-            df = pandas.read_table(input_buffer, names=["Subject", "Bit", "SeqID"], skipinitialspace=True)
-        df = df.replace('\[.*\]', '', regex=True)
+            df = pandas.read_table(
+                input_buffer,
+                names=[
+                    "Subject",
+                    "Bit",
+                    "SeqID"],
+                skipinitialspace=True)
+        df = df.replace(r'\[.*\]', '', regex=True)
         df["Subject"] = df["Subject"].str.strip()
-        df["Subject"] = df["Subject"].apply(lambda x: ' '.join(x.split(' ')[1:]))
+        df["Subject"] = df["Subject"].apply(
+            lambda x: ' '.join(x.split(' ')[1:]))
         df["Subject"] = df["Subject"].str.lower()
         df = df.replace("elongation factor ef-2", "elongation factor g")
-        df2 = df.sort_values(["Subject", "Bit"], ascending=[True,False])
-        df2 = df2.loc[df2.groupby('Subject')["Bit"].idxmax()].reset_index(drop=True)
+        df2 = df.sort_values(["Subject", "Bit"], ascending=[True, False])
+        df2 = df2.loc[df2.groupby(
+            'Subject')["Bit"].idxmax()].reset_index(drop=True)
         items = df2.SeqID.unique()
         newSeqs = []
-        for seq_record in SeqIO.parse(self.file, "fasta"):
+        for seq_record in SeqIO.parse(temp_cds_file, "fasta"):
             if (seq_record.id in items):
                 newSeqs.append(seq_record)
-        if len(newSeqs) <38:
+        if len(newSeqs) < 38:
             print("WARNING there are less than 38 sequences.")
         temp_file = os.path.join(tmpdir, 'hegs')
         with open(temp_file, "w") as handle:
@@ -88,9 +99,11 @@ class GeneralPipeline():
         os.remove(temp_file)
         return hegs
 
-    ## Uses DIAMOND on the database called testDB that contains a database assembled from the identical protein groups NCBI database of the
-    ## 40 highly expressed genes in bacteria. Outputs a file called matches with the sequence title, bitscore, and query sequence id. K is specified to avoid redundancy and get 
-    ## the top hit for each query. Diamond has a binary in the parent working directory in this application. Diamond could be installed to avoid this change in directory.
+    # Uses DIAMOND on the database called testDB that contains a database assembled from the identical protein groups NCBI database of the
+    # 40 highly expressed genes in bacteria. Outputs a file called matches with the sequence title, bitscore, and query sequence id. K is specified to avoid redundancy and get
+    # the top hit for each query. Diamond has a binary in the parent working
+    # directory in this application. Diamond could be installed to avoid this
+    # change in directory.
     def get_hegs(self, filename):
         hegs = None
         try:
@@ -99,35 +112,54 @@ class GeneralPipeline():
             temp_cds_file = os.path.join(tmpdir, 'input_to_diamond')
             with open(temp_cds_file, 'w') as file:
                 file.write(self.cds_data)
-            subprocess.call(["/tmp/diamond", "blastx", "-d", "testDB", "-q", temp_cds_file, "-o", temp_diamond_output_file, "-f", "6", "stitle", "bitscore", "qseqid", "-k", "1"])
-            with open(temp_file, 'r') as file:
+            subprocess.call(["./diamond",
+                             "blastx",
+                             "-d",
+                             "testDB",
+                             "-q",
+                             temp_cds_file,
+                             "-o",
+                             temp_diamond_output_file,
+                             "-f",
+                             "6",
+                             "stitle",
+                             "bitscore",
+                             "qseqid",
+                             "-k",
+                             "1"])
+            with open(temp_diamond_output_file, 'r') as file:
                 diamond_output = file.read()
-                hegs = self._get_hegs_to_forty_items(diamond_output, tmpdir)
+                hegs = self._get_hegs_to_forty_items(
+                    diamond_output, tmpdir, temp_cds_file)
         finally:
-            os.rmdir(tmpdir)
+            shutil.rmtree(tmpdir)
         return {"filename": filename, "hegs": hegs}
 
 
 class NcbiPipe(GeneralPipeline):
 
-    ## This function downloads the genome from a refseq nucleotide accession number. It delegates work to the get_accession_data method from the NCBIGet module.
-    ## Self.file is the file name of the downloaded fasta file. 
+    # This function downloads the genome from a refseq nucleotide accession number. It delegates work to the get_accession_data method from the NCBIGet module.
+    # Self.file is the file name of the downloaded fasta file.
+    def _get_data(self, accession):
+        assembly_data = get_accession_data(accession)
+        self.cds_data = assembly_data['data'].decode("utf-8")
+        self.file_name = assembly_data['filename']
+
+
+class NcbiAssemblyPipe(GeneralPipeline):
+    # This function downloads the genome from a refseq assembly accession number. It delegates work to the get_assembly_data method from the NCBIGet module.
+    # Self.file is the file name of the downloaded fasta file.
     def _get_data(self, accession):
         assembly_data = get_assembly_data(accession)
         self.cds_data = assembly_data['data']
         self.file_name = assembly_data['filename']
 
-class NcbiAssemblyPipe(GeneralPipeline):
-    ## This function downloads the genome from a refseq assembly accession number. It delegates work to the get_assembly_data method from the NCBIGet module.
-    ## Self.file is the file name of the downloaded fasta file. 
-    def _get_data(self, accession):
-        assembly_data = get_assembly_data(accession)
-        self.cds_data = assembly_data['data']
-        self.file_name = assembly_data['filename']
 
 class GenomePipe(GeneralPipeline):
 
-    ## Prodigal is run on the temporaryFile(which is what the uploaded genome is called). the -d flag specifies to output a file containing all of the found protein coding sequences found. 
+    # Prodigal is run on the temporaryFile(which is what the uploaded genome
+    # is called). the -d flag specifies to output a file containing all of the
+    # found protein coding sequences found.
     def _get_data(self, file_name, genome_data):
         try:
             tmpdir = tempfile.mkdtemp()
@@ -135,49 +167,80 @@ class GenomePipe(GeneralPipeline):
             temp_output_file = os.path.join(tmpdir, 'prodigal_output')
             with open(temp_input_file_to_prodigal, 'w') as file:
                 file.write(genome_data)
-            subprocess.call(["/tmp/prodigal", "-i", temp_input_file_to_prodigal, "-o", os.path.join(tmpdir, "tempGenes"), "-f", "gff", "-d", temp_output_file])
+            subprocess.call(["/tmp/prodigal",
+                             "-i",
+                             temp_input_file_to_prodigal,
+                             "-o",
+                             os.path.join(tmpdir,
+                                          "tempGenes"),
+                             "-f",
+                             "gff",
+                             "-d",
+                             temp_output_file])
             with open(temp_output_file, 'r') as file:
                 self.file_name = file_name
                 self.cds_data = file.read()
         finally:
-            os.rmdir(tmpdir)
+            shutil.rmtree(tmpdir)
 
-## This class is to simplify access in the actual flask application. It abstracts complexity away. Both of the methods utilize a directory for the get_hegs method(diamond). This could be avoided completely by installing diamond and modifying the code instead of using the binary.
+# This class is to simplify access in the actual flask application. It
+# abstracts complexity away. Both of the methods utilize a directory for
+# the get_hegs method(diamond). This could be avoided completely by
+# installing diamond and modifying the code instead of using the binary.
+
+
 class Facade:
 
-    ## This function is called when a user decides to upload a genome. First any temporary folder is removed. A new temporary folder is made. The 
-    ## temporaryFile that was uploaded is moved to this temporary folder. A Genome Pipeline is created. Prodigal is run on the data. The file name is set with get_data. 
-    ## Diamond is run with get_hegs. get_hegs_to_forty_items standardizes the output such that only forty genes remain. Get_bias returns a csv file into the temporary directoy. Self.file is changed in order to allow flask to actually
-    ## return the csv. 
-    def uploaded_genome(self, filename):
+    # This function is called when a user decides to upload a genome. First any temporary folder is removed. A new temporary folder is made. The
+    # temporaryFile that was uploaded is moved to this temporary folder. A Genome Pipeline is created. Prodigal is run on the data. The file name is set with get_data.
+    # Diamond is run with get_hegs. get_hegs_to_forty_items standardizes the output such that only forty genes remain. Get_bias returns a csv file into the temporary directoy. Self.file is changed in order to allow flask to actually
+    # return the csv.
+    def uploaded_genome(self, file_name, genome_data):
         genomepipe = GenomePipe()
-        genomepipe._prodigal_it(filename)
-        genomepipe._get_data(filename)
-        genomepipe._get_hegs(filename)
-        genomepipe._get_hegs_to_forty_items(filename)
-        genomepipe._calculate_bias("HEGS.fasta", filename)
-        self.file = filename + ".bias.csv"
+        genomepipe._get_data(file_name, genome_data)
+        hegs_fasta = genomepipe.get_hegs(file_name)["hegs"]
+        index, matrix = genomepipe.calculate_bias(hegs_fasta)
+        parseable_result = genomepipe.write_bias(file_name, index, matrix)
+        csv_output, errors = parseable_result['output'], parseable_result['errors']
+        return {
+            "hegs": hegs_fasta['hegs'],
+            "file_name": file_name,
+            "csv_data": csv_output,
+            "errors": errors}
 
-    ### This function is called when a user enters a RefSeq accession. 
-    ### Prodigal is first called on the uploaded genome. Then the file 
-    ### name is set with get_data. get_hegs outputs the matches from running 
-    ### a query against a local database. Clean_hegs is called to output only 40 
-    ### HEGs as there are some duplicates and inconsistencies in the output from diamond. 
-    ### get_bias actually returns the csv containing the bias statistics. The file name for facade is set to the bias csv file. 
+    # This function is called when a user enters a RefSeq accession. Prodigal is first called on the uploaded genome. Then the file name is set with get_data.
+    # get_hegs outputs the matches from running a query against a local database. Clean_hegs is called to output only 40 HEGs as there are some duplicates and
+    # inconsistencies in the output from diamond. get_bias actually returns the csv containing the bias statistics. The file name for facade is set to the
+    # bias csv file.
     def ncbi(self, accession):
         ncbipipe = NcbiPipe()
         ncbipipe._get_data(accession)
-        ncbipipe._get_hegs(accession)
-        ncbipipe._get_hegs_to_forty_items(accession)
-        ncbipipe._calculate_bias("HEGS.fasta", accession)
-        self.file = accession + ".bias.csv"
+        hegs_fasta = ncbipipe.get_hegs(accession)
+        index, matrix = ncbipipe.calculate_bias(hegs_fasta)
+        parseable_result = ncbipipe.write_bias(accession, index, matrix)
+        csv_output, errors = parseable_result['output'], parseable_result['errors']
+        return {
+            "hegs": hegs_fasta['hegs'],
+            "file_name": accession,
+            "csv_data": csv_output,
+            "errors": errors}
 
-  ### This function is called when a user enters a RefSeq Assembly accession. Prodigal is first called on the uploaded genome. Then the file name is set with get_data. get_hegs outputs the matches from running a query against a local database. Clean_hegs is called to output only 40 HEGs as there are some duplicates and inconsistencies in the output from diamond. get_bias actually returns the csv containing the bias statistics. The file name for facade is set to the bias csv file. 
+  # This function is called when a user enters a RefSeq Assembly accession.
+  # Prodigal is first called on the uploaded genome. Then the file name is
+  # set with get_data. get_hegs outputs the matches from running a query
+  # against a local database. Clean_hegs is called to output only 40 HEGs as
+  # there are some duplicates and inconsistencies in the output from
+  # diamond. get_bias actually returns the csv containing the bias
+  # statistics. The file name for facade is set to the bias csv file.
     def ncbiassembly(self, accession):
         ncbipipe = NcbiAssemblyPipe()
         ncbipipe._get_data(accession)
-        ncbipipe._get_hegs(accession)
-        ncbipipe._get_hegs_to_forty_items(accession)
-        ncbipipe._calculate_bias("HEGS.fasta", accession)
-        self.file = accession + ".bias.csv"
-
+        hegs_fasta = ncbipipe.get_hegs(accession)
+        index, matrix = ncbipipe.calculate_bias(hegs_fasta)
+        parseable_result = ncbipipe.write_bias(accession, index, matrix)
+        csv_output, errors = parseable_result['output'], parseable_result['errors']
+        return {
+            "hegs": hegs_fasta['hegs'],
+            "file_name": accession,
+            "csv_data": csv_output,
+            "errors": errors}
