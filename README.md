@@ -58,4 +58,6 @@ You may choose any number of methods for deployment! Flask is not meant for prod
 
 ### Note:
 
-Program runs in about 8.14 seconds on an averaged sized bacterial genome. 
+Program runs in about 8.14 seconds on an averaged sized bacterial genome when using NCBI refseq id 
+Program runs in about 20 seconds on an averaged sized bacterial genome 
+via upload feature. (PRODIGAL)
